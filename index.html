@@ -3,256 +3,342 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Popronde Alkmaar 2026</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Onofficiële timetable van Popronde Alkmaar, vrijdag 13 november 2026. Alle acts per tijd en locatie, met luistertracks.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;600&family=Public+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Micro+5&display=swap">
 <style>
-/* Layout: poster-kop, daarna schakelbare weergaven (tijdlijn-grid / per locatie / op tijd), act-kaarten met luisterlinks */
+/* Layout: grote pixelkop + datum, sticky pil-knoppen, drie weergaven (line-up / locaties / tijdlijn), luisterknop in elke rij, speler onderin */
 :root {
-  --bg: #eef0f5;
-  --surface: #ffffff;
-  --ink: #141826;
-  --muted: #5b6275;
-  --line: #d5d9e3;
-  --accent: #e2581c;
-  --accent-ink: #ffffff;
-  --accent-soft: #fbe3d6;
-  --star: #e2581c;
-  --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
-  --body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --bg: #f0f0f0;
+  --card: #ffffff;
+  --ink: #000000;
+  --muted: #666666;
+  --line: #e4e4e4;
+  --lane: #f0f0f0;
+  --hover: #b3b3b3;
+  --bad: #d03b3b;
+  --shadow: 0 0 5px rgba(0,0,0,.25);
+  --pixel: "Micro 5", "Courier New", monospace;
+  --sans: "Helvetica Now Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0f121b; --surface: #181c28; --ink: #eceef4; --muted: #98a0b4; --line: #2a3040;
-    --accent: #ff7a3d; --accent-ink: #160a03; --accent-soft: #3a2116; --star: #ff7a3d; color-scheme: dark;
+    --bg: #000000; --card: #1a1a19; --ink: #ffffff; --muted: #b3b3b3; --line: #2c2c2a; --lane: #0d0d0d;
+    --hover: #666666; --bad: #e66767; --shadow: 0 0 0 1px #2c2c2a; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0f121b; --surface: #181c28; --ink: #eceef4; --muted: #98a0b4; --line: #2a3040;
-  --accent: #ff7a3d; --accent-ink: #160a03; --accent-soft: #3a2116; --star: #ff7a3d; color-scheme: dark;
+  --bg: #000000; --card: #1a1a19; --ink: #ffffff; --muted: #b3b3b3; --line: #2c2c2a; --lane: #0d0d0d;
+  --hover: #666666; --bad: #e66767; --shadow: 0 0 0 1px #2c2c2a; color-scheme: dark;
 }
 * { box-sizing: border-box; }
-body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; }
+html { padding-top: env(safe-area-inset-top, 0px); }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.3; -webkit-font-smoothing: antialiased; }
 a { color: inherit; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
-.wrap { max-width: 1180px; margin: 0 auto; padding-block: 28px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 28px; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1140px; margin: 0 auto; padding-block: 20px 120px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 
-header.hero { display: grid; gap: 14px; }
-.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 16px; }
-.eyebrow b { color: var(--accent); font-weight: 600; }
-h1 { font-family: var(--display); font-stretch: 62%; font-weight: 900; font-size: clamp(54px, 12vw, 132px); line-height: .84; letter-spacing: -.01em; margin: 0; text-transform: uppercase; text-wrap: balance; }
-h1 span { display: block; font-stretch: 125%; font-weight: 800; font-size: .36em; letter-spacing: .02em; color: var(--accent); margin-top: .25em; }
-.lede { max-width: 62ch; color: var(--muted); margin: 0; }
+/* pillen, zoals popronde.nl */
+.pill { display: inline-flex; align-items: center; gap: 6px; background: var(--card); color: var(--ink); border: 0; border-radius: 1.5rem; padding: .5rem 1.15rem; font-weight: 600; font-size: .85rem; text-decoration: none; box-shadow: var(--shadow); cursor: pointer; white-space: nowrap; }
+.pill:hover { background: var(--hover); }
+.pill[aria-pressed="true"], .pill.black { background: var(--ink); color: var(--bg); }
 
-.controls { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 10px; border-bottom: 1px solid var(--line); }
-body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
-.seg { display: inline-flex; border: 1.5px solid var(--ink); border-radius: 999px; overflow: hidden; }
-.seg button { font: 600 13px var(--body); background: transparent; color: var(--ink); border: 0; padding: 7px 14px; cursor: pointer; }
-.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
-.chip { font: 500 12px var(--body); border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
-.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-.chip.mine { border-color: var(--accent); }
-.count { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-left: auto; }
+.topbar { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.hero { padding-block: 40px 28px; }
+h1 { font-family: var(--pixel); font-weight: 400; font-size: clamp(120px, 31vw, 330px); line-height: .72; margin: 0; text-transform: uppercase; letter-spacing: .01em; word-break: break-word; }
+.date { font-weight: 700; font-size: clamp(44px, 10vw, 96px); line-height: 1; margin: 6px 0 0; letter-spacing: -.01em; }
+.facts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 22px; }
+.facts span { background: var(--card); border-radius: 1.5rem; padding: .45rem 1rem; font-weight: 600; font-size: .8rem; }
 
-/* Tijdlijn */
-.tl-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
-.tl { --hour: 150px; position: relative; min-width: calc(var(--hour) * 6.5 + 190px); }
-.tl-row { display: grid; grid-template-columns: 190px 1fr; border-bottom: 1px solid var(--line); min-height: 58px; }
-.tl-row:last-child { border-bottom: 0; }
-.tl-venue { position: sticky; left: 0; z-index: 2; background: var(--surface); padding: 8px 12px; border-right: 1px solid var(--line); display: flex; gap: 8px; align-items: center; font-weight: 600; font-size: 13px; line-height: 1.2; }
-.num { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: var(--bg); font: 600 11px/22px var(--mono); text-align: center; }
-.tl-lane { position: relative; background-image: repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px calc(var(--hour) / 2)); }
-.tl-head .tl-lane { background: none; }
-.tl-head .tl-venue { font: 600 11px var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
-.tick { position: absolute; top: 50%; transform: translate(-50%, -50%); font: 600 12px var(--mono); color: var(--muted); }
-.blk { position: absolute; top: 6px; bottom: 6px; border-radius: 6px; background: var(--accent-soft); border: 1px solid transparent; padding: 4px 8px; overflow: hidden; text-decoration: none; display: flex; flex-direction: column; justify-content: center; cursor: pointer; }
-.blk:hover { border-color: var(--accent); }
-.blk.fav { background: var(--accent); color: var(--accent-ink); }
-.blk .t { font: 600 11px var(--mono); opacity: .8; font-variant-numeric: tabular-nums; }
-.blk .n { font-weight: 700; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.blk.dim { opacity: .25; }
-.tl-note { font-size: 12px; color: var(--muted); margin: 8px 0 0; }
+.controls { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-block: 12px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
+.controls .spacer { flex: 1; }
+.select { appearance: none; -webkit-appearance: none; background: var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E") no-repeat right 14px center; color: var(--ink); border: 0; border-radius: 1.5rem; padding: .5rem 2.2rem .5rem 1.15rem; font: 600 .85rem var(--sans); box-shadow: var(--shadow); cursor: pointer; }
+.count { font-size: .8rem; color: var(--muted); font-weight: 600; }
 
-/* Lijsten */
-.venues { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
-.venue { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.venue h2 { margin: 0; font-family: var(--display); font-stretch: 85%; font-weight: 800; font-size: 22px; line-height: 1.1; display: flex; gap: 10px; align-items: center; text-wrap: balance; }
-.venue h2 .num { width: 26px; height: 26px; line-height: 26px; font-size: 12px; }
-.access { font-size: 12px; color: var(--muted); margin-top: -6px; }
-.acts { display: flex; flex-direction: column; gap: 0; }
-.act { display: grid; grid-template-columns: 52px 1fr auto; gap: 4px 12px; padding: 12px 0; border-top: 1px solid var(--line); min-width: 0; }
-.act:first-child { border-top: 0; padding-top: 0; }
-.act .time { font: 600 15px var(--mono); font-variant-numeric: tabular-nums; color: var(--accent); }
-.act .main { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-.act .name { font-family: var(--display); font-stretch: 100%; font-weight: 800; font-size: 18px; line-height: 1.15; text-decoration: none; }
-.act .name:hover { text-decoration: underline; }
-.act .where { font-size: 13px; color: var(--muted); }
-.tags { display: flex; flex-wrap: wrap; gap: 4px; }
-.tag { font: 500 11px var(--mono); text-transform: uppercase; letter-spacing: .04em; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; }
-.desc { font-size: 13px; color: var(--muted); margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.act.open .desc { -webkit-line-clamp: unset; display: block; }
-.more { font: 500 12px var(--body); background: none; border: 0; padding: 0; color: var(--ink); text-decoration: underline; cursor: pointer; justify-self: start; }
+/* line-up */
+.card { background: var(--card); border-radius: 1.5rem; padding: 8px 20px; }
+.slot-time { font-family: var(--pixel); font-size: 44px; line-height: 1; padding: 18px 0 4px; display: flex; align-items: baseline; gap: 12px; }
+.slot-time small { font-family: var(--sans); font-size: .75rem; font-weight: 600; color: var(--muted); }
+.row { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 4px 14px; align-items: start; padding: 14px 0; border-top: 1px solid var(--line); }
+.card > .row:first-child, .slot-time + .row { border-top: 0; }
+.row .info { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.name { font-weight: 700; font-size: 1.35rem; line-height: 1.05; text-decoration: none; letter-spacing: -.01em; }
+.name:hover { color: var(--hover); }
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: .85rem; font-weight: 600; }
+.venue-tag { display: inline-flex; align-items: center; gap: 6px; }
+.num { flex: none; display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--ink); color: var(--bg); font: 700 11px var(--sans); }
+.genre { color: var(--muted); }
+.desc { font-size: .9rem; color: var(--muted); margin: 0; max-width: 70ch; line-height: 1.4; }
 .links { display: flex; flex-wrap: wrap; gap: 6px; }
-.links a { font: 600 12px var(--body); text-decoration: none; border-radius: 999px; padding: 3px 10px; border: 1.5px solid var(--ink); }
-.links a.primary { background: var(--ink); color: var(--bg); }
-.links a:hover { border-color: var(--accent); }
-.star { background: none; border: 0; cursor: pointer; padding: 2px; color: var(--muted); align-self: start; }
-.star svg { width: 22px; height: 22px; display: block; }
-.star[aria-pressed="true"] { color: var(--star); }
-.star[aria-pressed="true"] svg path { fill: currentColor; }
-.chrono { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
-.slot { display: grid; grid-template-columns: 70px 1fr; gap: 12px; border-top: 1px solid var(--line); padding-block: 14px; }
-.slot:first-child { border-top: 0; padding-top: 0; }
-.slot > .time { font: 600 20px var(--mono); color: var(--accent); font-variant-numeric: tabular-nums; }
-.slot .acts { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px 24px; }
-.slot .act { grid-template-columns: 1fr auto; border-top: 0; padding: 0; }
-.empty { color: var(--muted); padding: 24px 0; }
-.clash { font: 600 12px var(--body); color: var(--accent); }
-footer { font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
-@media (max-width: 560px) {
-  .count { margin-left: 0; width: 100%; }
-  .venues { grid-template-columns: 1fr; }
-  .slot { grid-template-columns: 1fr; gap: 6px; }
-  .tl-row { grid-template-columns: 120px 1fr; }
-  .tl { min-width: calc(var(--hour) * 6.5 + 120px); --hour: 120px; }
-}
-@media (prefers-reduced-motion: no-preference) { .blk, .chip, .links a { transition: background-color .15s, border-color .15s; } }
-</style>
+.links a { font-size: .75rem; font-weight: 600; text-decoration: none; border-radius: 1.5rem; padding: .3rem .8rem; background: var(--lane); }
+.links a:hover { background: var(--hover); }
+.side { display: flex; align-items: center; gap: 4px; }
 
+/* luisterknop */
+.play { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--ink); color: var(--bg); display: grid; place-items: center; cursor: pointer; flex: none; }
+.play:hover { background: var(--hover); }
+.play svg { width: 16px; height: 16px; fill: currentColor; }
+.play.none { background: transparent; color: var(--line); cursor: default; }
+.play.playing { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--ink); }
+.star { width: 40px; height: 40px; border: 0; background: none; cursor: pointer; display: grid; place-items: center; color: var(--hover); }
+.star svg { width: 22px; height: 22px; }
+.star[aria-pressed="true"] { color: var(--ink); }
+.star[aria-pressed="true"] path { fill: currentColor; }
+.clash { color: var(--bad); font-size: .8rem; font-weight: 600; }
+.now { background: var(--ink); color: var(--bg); border-radius: 1.5rem; font-size: .7rem; font-weight: 700; padding: 2px 8px; text-transform: uppercase; letter-spacing: .05em; }
+
+/* locaties */
+.venues { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; }
+.venue { background: var(--card); border-radius: 1.5rem; padding: 20px; min-width: 0; }
+.venue h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 4px; font-size: 1.6rem; line-height: 1; letter-spacing: -.01em; }
+.venue h2 .num { width: 32px; height: 32px; font-size: 14px; }
+.venue .acc { font-size: .75rem; color: var(--muted); font-weight: 600; margin: 0 0 6px 42px; }
+.venue .row { grid-template-columns: 44px minmax(0, 1fr) auto; }
+.venue .t { font-family: var(--pixel); font-size: 30px; line-height: 1; padding-top: 2px; }
+
+/* tijdlijn */
+.tl-scroll { overflow-x: auto; background: var(--card); border-radius: 1.5rem; }
+.tl { --hour: 170px; min-width: calc(var(--hour) * 7 + 170px); padding-block: 6px; }
+.tl-row { display: grid; grid-template-columns: 170px 1fr; min-height: 64px; }
+.tl-venue { position: sticky; left: 0; z-index: 2; background: var(--card); display: flex; align-items: center; gap: 8px; padding: 0 12px 0 16px; font-weight: 700; font-size: .85rem; line-height: 1.1; }
+.tl-lane { position: relative; margin: 4px 0; border-radius: 12px; background: var(--lane) repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px var(--hour)); }
+.tl-head .tl-lane { background: none; min-height: 30px; }
+.tick { position: absolute; top: 50%; transform: translateY(-50%); font-family: var(--pixel); font-size: 26px; padding-left: 4px; }
+.blk { position: absolute; top: 5px; bottom: 5px; border-radius: 10px; background: var(--card); box-shadow: var(--shadow); display: flex; align-items: center; gap: 6px; padding: 0 8px 0 5px; overflow: hidden; }
+.blk .play { width: 30px; height: 30px; }
+.blk .play svg { width: 11px; height: 11px; }
+.blk .bt { min-width: 0; display: flex; flex-direction: column; }
+.blk .bt span { font-family: var(--pixel); font-size: 18px; line-height: .9; }
+.blk .bt a { font-weight: 700; font-size: .8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-decoration: none; }
+.blk.fav { background: var(--ink); color: var(--bg); }
+.blk.fav .play { background: var(--bg); color: var(--ink); }
+.blk.dim { opacity: .2; }
+.note { font-size: .8rem; color: var(--muted); margin: 10px 4px 0; }
+.empty { padding: 30px 0; color: var(--muted); font-weight: 600; }
+
+/* speler */
+.player { position: fixed; z-index: 40; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); width: min(560px, calc(100% - 24px)); background: var(--ink); color: var(--bg); border-radius: 2rem; padding: 8px 10px 8px 8px; display: flex; align-items: center; gap: 12px; box-shadow: 0 6px 24px rgba(0,0,0,.3); }
+.player .play { background: var(--bg); color: var(--ink); }
+.player .pinfo { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.player .pname { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.player .psub { font-size: .75rem; opacity: .7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar { height: 3px; background: color-mix(in srgb, var(--bg) 25%, transparent); border-radius: 2px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--bg); }
+.pclose { border: 0; background: none; color: var(--bg); width: 36px; height: 36px; cursor: pointer; font-size: 22px; line-height: 1; opacity: .8; }
+
+footer { margin-top: 40px; font-size: .8rem; color: var(--muted); display: flex; flex-direction: column; gap: 6px; max-width: 70ch; }
+footer a { font-weight: 600; }
+
+@media (max-width: 600px) {
+  .card { padding: 4px 14px; }
+  .row { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto 1fr; }
+  .row > .play, .row > .play.none { grid-column: 2; grid-row: 1; }
+  .row .side { grid-column: 2; grid-row: 2; justify-self: end; align-self: start; }
+  .row .info { grid-column: 1; grid-row: 1 / span 2; }
+  .venue .row { grid-template-columns: 40px minmax(0, 1fr) auto; }
+  .venue .row .info { grid-column: 2; grid-row: 1 / span 2; }
+  .venue .row > .play { grid-column: 3; }
+  .venue .row .side { grid-column: 3; }
+  .venues { grid-template-columns: 1fr; }
+  .tl { --hour: 140px; min-width: calc(var(--hour) * 7 + 120px); }
+  .tl-row { grid-template-columns: 120px 1fr; }
+  .tl-venue { font-size: .75rem; padding-left: 12px; }
+  .controls .spacer { display: none; }
+  .count { width: 100%; }
+}
+@media (prefers-reduced-motion: no-preference) { .pill, .play, .links a { transition: background-color .15s; } }
+</style>
 </head>
 <body>
 <div class="wrap">
+  <div class="topbar">
+    <a class="pill" href="https://popronde.nl/steden/alkmaar" target="_blank" rel="noopener">Bron: popronde.nl ↗</a>
+    <span class="pill" style="box-shadow:none;cursor:default;background:transparent">Onofficieel overzicht</span>
+  </div>
+
   <header class="hero">
-    <div class="eyebrow"><b>Vrijdag 13 november 2026</b><span>17 locaties</span><span>39 acts</span><span>Gratis toegang</span><span>Infostand vanaf 19:00</span></div>
-    <h1>Popronde Alkmaar<span>Timetable</span></h1>
-    <p class="lede">Alle bekende optredens per locatie en per tijd. Klik een naam voor het Popronde-profiel, of meteen door naar Spotify, YouTube, Bandcamp of SoundCloud. Zet een ster bij wat je wil zien; die keuze blijft in deze browser bewaard.</p>
+    <h1>Alkmaar</h1>
+    <p class="date">13.11.26</p>
+    <div class="facts"><span>Popronde 2026</span><span>Vrijdag vanaf 18:30</span><span>17 locaties</span><span>39 acts</span><span>Gratis</span><span>Infostand vanaf 19:00</span></div>
   </header>
 
   <div class="controls">
-    <div class="seg" role="group" aria-label="Weergave">
-      <button type="button" id="v-tl" data-view="tl" aria-pressed="true">Tijdlijn</button>
-      <button type="button" id="v-venue" data-view="venue" aria-pressed="false">Per locatie</button>
-      <button type="button" id="v-time" data-view="time" aria-pressed="false">Op tijd</button>
-    </div>
-    <div class="chips" id="chips"></div>
+    <button type="button" class="pill" data-view="lineup" id="v-lineup">Line-up</button>
+    <button type="button" class="pill" data-view="venues" id="v-venues">Locaties</button>
+    <button type="button" class="pill" data-view="tl" id="v-tl">Tijdlijn</button>
+    <span class="spacer"></span>
+    <button type="button" class="pill" id="f-fav" aria-pressed="false">★ Mijn avond</button>
+    <select class="select" id="f-genre" aria-label="Filter op genre"></select>
     <span class="count" id="count"></span>
   </div>
 
   <main id="out"></main>
 
   <footer>
-    <span>Bron: popronde.nl/steden/alkmaar, opgehaald 7 november 2026. Tijden kunnen nog wijzigen; check de Popronde-app op de avond zelf.</span>
-    <span>Rolstoeltoegankelijk volgens de Popronde-site: Downtown, VEER, Mojo's, Roest, HAL25, Bibliotheek, Café Klunder, Rockville, The Boules Club, Podium Victorie.</span>
+    <span>Onofficieel overzicht, gemaakt voor vrienden. Alle info en luistertracks komen van <a href="https://popronde.nl/steden/alkmaar" target="_blank" rel="noopener">popronde.nl</a> (opgehaald 7 november 2026). Tijden kunnen nog wijzigen: check de Popronde-app op de avond zelf.</span>
+    <span>Sterren worden alleen in je eigen browser bewaard.</span>
   </footer>
 </div>
 
-<script>
-const ACTS = [{"time": "18:30", "id": "37416", "name": "Lola Louii", "num": 1, "venue": "Gunnery's", "wheelchair": false, "tags": ["Pop", "Alternative"], "desc": "Lola Louii is een singer-songwriter die neo-soul en alt-pop mixt alsof je meeleest in haar dagboek. Haar songs zijn eerlijk, vol gelaagde analogieën waarin ze haar gedachten en gevoelens ontleedt. Met een mix van echte instrumenten, elektronische producties en speelse grooves trekt ze je live haar innerwereld in.", "media": {"Spotify": "https://open.spotify.com/artist/6QPGfku2I1aZz09R0fd6K1?si=tsGttkYQR4qX2EckJHoU1g", "Instagram": "https://www.instagram.com/lolalouii?igsh=MTl2ZjB1c2hldmdmcA%3D%3D&utm_source=qr", "YouTube": "https://www.youtube.com/channel/UCh3RiIRPLnJ9GMbmTy154HA", "Soundcloud": "https://on.soundcloud.com/NeuYSUG3a0YWeVh4LC"}}, {"time": "19:00", "id": "36902", "name": "Amelie Spinks", "num": 2, "venue": "Downtown", "wheelchair": true, "tags": ["Folk", "Indie"], "desc": "Amsterdam-based indie-folk songwriter Amelie Spinks blends delicate storytelling with her New Zealand country-folk roots. Joined by Adrian Bifano, she creates intimate listening experiences shaped by warmth and vulnerability, following her debut EP Warm Light, ESNS showcase, and 2026 releases.", "media": {"Website": "https://www.ameliespinks.com/", "Spotify": "https://open.spotify.com/artist/2msCn66H8nedyo0JqNg9aH?si=JVAxNAv6RYiwRKp386_2DA", "Instagram": "https://www.instagram.com/ameliespinks/", "Soundcloud": "https://on.soundcloud.com/YKGiMGTYX9ZReTBr9", "Bandcamp": "https://ameliespinks.bandcamp.com/"}}, {"time": "19:00", "id": "36727", "name": "Toobss", "num": 3, "venue": "VEER", "wheelchair": true, "tags": ["Afrobeat", "Hip Hop"], "desc": "Toobss is een Rotterdamse artiest die Afro, Urban en Zouk combineert met een energieke en persoonlijke live-ervaring. Met miljoenen streams en een sterke live-reputatie speelde hij clubs en festivals door het land. Op 26 december 2025 verzorgde hij het voorprogramma van Broederliefde in Ahoy Rotterdam.", "media": {"Spotify": "https://open.spotify.com/artist/0rzkFZ1D0Aayl1ysZnWlpC?si=eEwIQVB2TrqaloHDUFD8Kw", "Instagram": "https://www.instagram.com/toobss__/", "YouTube": "https://www.youtube.com/@toobss"}}, {"time": "19:15", "id": "37367", "name": "YRSA", "num": 4, "venue": "Mojo's Entertainment", "wheelchair": true, "tags": ["Nederlandstalig", "Alternative"], "desc": "YRSA maakt van een mug een olifant met alternatieve pop en poëtische teksten. Ze blaast kleine momenten op tot iets groters en nodigt luisteraars uit om stil te staan bij wat normaal ongemerkt voorbijgaat. Met gelaagde instrumentatie en invloeden van Eefje de Visser, Spinvis en St. Vincent creëert ze een open clubhuis waar mensen samen alleen kunnen zijn.", "media": {"Website": "https://yrsamarleen.nl", "Spotify": "https://open.spotify.com/artist/5BLCBw3ZwkvqyUuUtozq2h?si=t_5l4oZbTWifyfFIhTMFFw", "Instagram": "https://www.instagram.com/yrsamarleen/", "YouTube": "https://open.spotify.com/artist/5BLCBw3ZwkvqyUuUtozq2h?si=t_5l4oZbTWifyfFIhTMFFw"}}, {"time": "19:30", "id": "36247", "name": "Calis Nyarko", "num": 7, "venue": "Roest", "wheelchair": true, "tags": ["House", "Dance"], "desc": "Calis Nyarko is een Gospel House-artiest van West-Afrikaanse afkomst, bekend om zijn unieke vermogen om de zielvolle essentie van gospel te combineren met de dynamische energie van elektronische muziek. Calis smelt live instrumentatie saxofoon, drumpad en toetsen samen met dynamische elektronische producties om een meeslepende muzikale ervaring te creëren.", "media": {"Website": "https://cream-collective.eu/music/#:~:text=and%20John%20Coltrane.-,CALIS%20NYARKO,-Calis%20Nyarko%20is", "Spotify": "https://open.spotify.com/track/1FOvh2PhCqk94ZSJ0AOHqE?si=4fd4d73a813b44d1", "Instagram": "https://www.instagram.com/calisnyarko/"}}, {"time": "19:30", "id": "37281", "name": "HOOFS", "num": 6, "venue": "HAL25", "wheelchair": true, "tags": ["Noise", "Post-Punk"], "desc": "Met een snoeiharde mix van noise en postpunk werd HOOFS door 3voor12 getypeerd als ‘niet voor watjes’. Met intense muziek en shows, die steevast zorgen voor moshpits en collectieve ontlading, vieren ze het leven en creëren ze een plek waar iedereen zichzelf kan zijn. Het geluid is hard, de ruimte zacht. Watjes wees welkom.", "media": {"Spotify": "https://open.spotify.com/artist/4QjLwd8IdqEMvKdkoSE5Bp?si=K4AJnbNoQ4SzRNeCm_TYuA", "Instagram": "https://www.instagram.com/hoofs_music/", "YouTube": "https://www.youtube.com/@hoofs/videos"}}, {"time": "19:30", "id": "37124", "name": "Sterre Jasmine", "num": 5, "venue": "'t Ossehoofd", "wheelchair": false, "tags": ["Country", "Pop"], "desc": "Sterre Jasmine is een 23-jarige country pop artiest. Haar muziek is een mix van intieme country storytelling en energieke pop hooks. In een wereld waar stilte vaak het veiligst voelt, kiest Sterre ervoor om te zingen en verhalen te delen die mensen écht raken en verbinden. Geïnspireerd door Kacey Musgraves, Dolly Parton en The Chicks.", "media": {"Website": "https://www.sterrejasmine.com", "Instagram": "https://www.instagram.com/sterrejasmine_/", "YouTube": "https://www.youtube.com/@sterre.jasmine"}}, {"time": "20:00", "id": "36723", "name": "De Zweefclub", "num": 17, "venue": "Podium Victorie", "wheelchair": true, "tags": ["Indie"], "desc": "De Zweefclub maakt knutselpop: luid en lief, strak en geknutseld. Onvoorspelbare muziek vol humor, new wave- en punk-invloeden, met een zachte ondertoon. De liedjes gaan over: vliegeren, diepzeeduiken, polkadansen, modderworstelen en uitslapen. \n\nNa de winst van de Grote Prijs Van Nederland en een volle zaal op Noorderslag, zijn ze klaar voor eeuwige roem.", "media": {"Website": "https://www.dezweef.club", "Spotify": "https://open.spotify.com/artist/67bciYwiIDwTuPynYTV44x?si=gXlFGRDtSBaMomktf4CeiQ", "Instagram": "https://www.instagram.com/dezweefclub/", "YouTube": "https://www.youtube.com/@dezweefclub", "Bandcamp": "https://dezweefclub.bandcamp.com/"}}, {"time": "20:00", "id": "36817", "name": "Maxime", "num": 8, "venue": "Bibliotheek Alkmaar Centrum", "wheelchair": true, "tags": ["Singer/songwriter", "Indie"], "desc": "Muziek is voor Maxime een plek van begrip, een omhelzing voor de ziel. Ze maakt Nederlandstalige indiepop waarbij klassieke elementen zoals akoestische gitaar, piano en meerstemmigheid samenkomen met elektronische invloeden. Meeslepend, doordacht en bedoeld om te raken. Denk Billie Eilish, Raye, MARO en Froukje. Te boeken als solo- of duo-act.", "media": {"Spotify": "https://open.spotify.com/artist/67ijcDBwFthXo6WRpEl6kR?si=HzREY2bCQu6mz8DwGUB54g", "Instagram": "https://www.instagram.com/maks.maxime", "YouTube": "https://www.youtube.com/@maks.maxime"}}, {"time": "20:15", "id": "37536", "name": "Gilly", "num": 3, "venue": "VEER", "wheelchair": true, "tags": ["Hip Hop", "Pop"], "desc": "Gilly, het gezicht van noord neemt je mee in verhalen echte verhalen uit het leven, de buurt en de stad. Opgegroeid in de aandachtswijk Tilburg Noord is Gilly opgegroeid tussen verschillende invloeden en keuzes die hem gevormd hebben. Hij heeft veel gezien, het vallen en opstaan van mensen in de wijk, mensen zien groeien en afbrokkelen. De realiteit van de o", "media": {"Spotify": "https://open.spotify.com/artist/5P6kllyzE7PLpjJECO5LnN?si=oXyruedcSryUdmqCMqruDA", "Instagram": "https://www.instagram.com/gillynoord/", "YouTube": "https://youtube.com/@hetgezichtvannoord?si=BPcHm1nVokgK2-EC"}}, {"time": "20:15", "id": "37243", "name": "WABR", "num": 9, "venue": "Café De Tuin", "wheelchair": false, "tags": ["Electro", "Nederlandstalig"], "desc": "WABR zoekt in Nederlandse teksten en speelse elektronische muziek naar de balans tussen realiteit en simulatie. Ontstaan in onze slaapkamerstudio met één regel: we zeggen altijd ja. \nDe invloeden lopen van Mura Masa tot Doe Maar en retro game-muziek. We bespreken dokters, tijdgebrek en allerlei andere vage zaken. Neem het niet te serieus, of juist wel.", "media": {"Website": "https://linktr.ee/wabrwabr", "Spotify": "https://open.spotify.com/artist/3oOqFzbLfXGYSCr0nJCtIx?si=F4HeqKRVS32WPsixFmmSHg", "Instagram": "https://www.instagram.com/wabrwabr/", "YouTube": "https://www.youtube.com/@WABRWABR"}}, {"time": "20:30", "id": "37534", "name": "ARA", "num": 11, "venue": "Café Klunder", "wheelchair": true, "tags": ["Singer/songwriter", "Folk"], "desc": "Tussen ruïnes en het heden laat Ara oude klanken opnieuw ademen. Vanuit zijn Armeense achtergrond bouwt hij een bijzonder geluid waarin folk, pop en filmische invloeden samenkomen. Nadat zijn debuut EP weerklank vond in Nederland, Armenië en Los Angeles, speelde Ara support shows voor o.a. Racoon en ook eigen shows in binnen- en buitenland.", "media": {"Website": "https://www.aramusic.art/", "Spotify": "https://open.spotify.com/artist/7eMq20o4L2IGNOa4AVugMr?si=G1hiElaVSG6gbPDUSBx_ew", "Instagram": "https://www.instagram.com/aramusic", "YouTube": "https://www.youtube.com/@AraMusic27"}}, {"time": "20:30", "id": "36521", "name": "Marieke Schenk", "num": 10, "venue": "Café Stapper", "wheelchair": false, "tags": ["Pop", "Nederlandstalig"], "desc": "Marieke Schenk: een popartiest met een krachtige, energieke liveshow. Ze stond op de ESNS '26 line-up en speelt op grote festivals. Debuutsingle Verward Persoon (38K streams) ging viraal op TikTok. Nieuwe muziek kreeg airplay op 3FM. Gemixt met rock maakt ze rauwe, catchy songs, geïnspireerd door Pommelien Thijs, voor wie ze de aftershow speelde in AFAS Live", "media": {"Website": "https://www.mariekeschenk.nl", "Spotify": "https://open.spotify.com/artist/0SYFuJ8cP1yG4Xp88SjEcb?si=WWTKCCPbQ6K2SHdVVI2JVA", "Instagram": "https://www.instagram.com/marieke.schenk", "YouTube": "https://www.youtube.com/results?search_query=marieke+schenk"}}, {"time": "20:30", "id": "37509", "name": "Mees", "num": 12, "venue": "'t Hoekje", "wheelchair": false, "tags": ["Pop", "Nederlandstalig"], "desc": "Mees is een Rotterdamse zanger die pop, hiphop en levenslied naar zijn hand zet. Wat begint op de piano groeit uit tot energieke liveshows. In 2025 speelde hij zijn eerste festivals en deed hij als voorprogramma de volledige clubtour van Kraantje Pappie. Hij is getekend bij platenlabel Top Notch en bracht daar zijn debuut-EP ‘Hoofd in de wolken’ uit.", "media": {"Website": "https://www.madebymeesmusic.nl/", "Spotify": "https://open.spotify.com/artist/69JBEM02xkpzdC6nuafOiI?si=JwQ9Y2unQpSyZ4EKwXilcw", "Instagram": "https://www.instagram.com/madebymees/"}}, {"time": "20:45", "id": "36626", "name": "Marit Nygård en de Medemensen", "num": 2, "venue": "Downtown", "wheelchair": true, "tags": ["Kleinkunst", "Indie"], "desc": "Met twee voeten in de modder hebben Marit Nygård en de Medemensen veel vragen en weinig antwoorden. De zoektocht naar een beetje richting vertaalt zich naar catchy kleinkunst over rennen, vastlopen en de wens naar meer zachtheid. Ze speelden al meer dan 100 shows, van ESNS tot op een bootje. Stap in de bakfiets van de Medemensen en kom fluitend verdwalen!", "media": {"Website": "https://maritnygard.com/", "Spotify": "https://open.spotify.com/artist/4FKvA5jaSSTDdt0AW0Jeqx?si=XOmQXkrsQT-HCSA8ykFDqQ", "Instagram": "https://www.instagram.com/marit.nygard/", "YouTube": "https://www.youtube.com/@marit_nygard", "Bandcamp": "https://maritnygard.bandcamp.com/"}}, {"time": "21:00", "id": "36943", "name": "Anna Joan", "num": 6, "venue": "HAL25", "wheelchair": true, "tags": ["Alternative", "Pop"], "desc": "A multi-talented showstopper. Drawing inspiration from artists like FKA Twigs, COBRAH and Sevdaliza, Anna Joan is set to unleash her raw, dark electronic sound in '26. Her new, self-produced EP 'SKIN' is a sonic manifesto of sexual liberation. In her electronic performances she blends dance, live-music and outstanding vocal performances in a raw soundworld.", "media": {"Website": "https://www.annajoan.com", "Spotify": "https://open.spotify.com/album/5q9WWoWeiYOimabwqCvRTy?si=5tDxSTevSxCB5kFpgmYOmg", "Instagram": "https://www.instagram.com/annajoanofficial/", "YouTube": "https://www.youtube.com/channel/UCotr5oglGFhGUAsdcq47fsg?view_as=subscriber", "Soundcloud": "https://soundcloud.com/annajoanofficial", "Bandcamp": "https://annajoan.bandcamp.com"}}, {"time": "21:00", "id": "36259", "name": "crashing", "num": 13, "venue": "Rockville", "wheelchair": true, "tags": ["Shoegaze", "Alternative"], "desc": "Geïnspireerd door shoegaze en alt-rock giganten als Dinosaur Jr. en My Bloody Valentine grijpt Crashing je met een mix van galmende, intense hooks en puur oorverdovend volume met een sterke nadruk op DIY cultuur. Bereid je voor op meeslepende noise en songs met harde impact, ontworpen om zowel gehoord als fysiek gevoeld te worden. Neem oordopjes mee.", "media": {"Spotify": "https://open.spotify.com/artist/6brUoKxN2RCw6j1aVVIoqr?si=72X92i8sRpOOZCCAJ5W4IA", "Instagram": "https://www.instagram.com/crashingcrashingcrashing/", "YouTube": "https://www.youtube.com/watch?v=H9GN9CgGUK0"}}, {"time": "21:00", "id": "36906", "name": "Loeck", "num": 5, "venue": "'t Ossehoofd", "wheelchair": false, "tags": ["Pop", "Indie"], "desc": "Loeck balanceert tussen softboy en wannabe rockster, chaotisch en vol tegenstrijdigheden. Waar zijn uitstraling nonchalant blijft, wringt er iets onder de oppervlakte. Zijn debuut-EP Sobeit. verschijnt in 2026 en draait om één gedachte: “het is maar zo.” Loslaten of doen alsof het je niets raakt.", "media": {"Spotify": "https://open.spotify.com/artist/2U4Qf4bmyxAdEpgM6m8rRk?si=9oH7nWxKQmqsVETUrvTxKw", "Instagram": "https://www.instagram.com/l.oeck/"}}, {"time": "21:00", "id": "36907", "name": "Tessa June", "num": 4, "venue": "Mojo's Entertainment", "wheelchair": true, "tags": ["Pop", "Nederlandstalig"], "desc": "Tessa June maakt NL-pop die raakt. Haar persoonlijke liedjes vinden altijd iets universeels. Na een uitverkochte Cinetol-show ('24) en een clubtour langs Luxor Live, Mezz en Paradiso, volgde in '25 een duet met Niels Destadsbader, werd Meisjes Lopen Sneller opnieuw toegevoegd aan Beste Van NL en bereikte ze 6 miljoen streams. Online bereikt ze 35.000 volgers", "media": {"Website": "https://www.tessajune.nl/", "Spotify": "https://open.spotify.com/artist/67UrL3cZJQ2WhwqdikarKk", "Instagram": "https://www.instagram.com/tessajuneofficial/", "YouTube": "https://youtube.com/@tessajune"}}, {"time": "21:15", "id": "37168", "name": "Doris Vosters", "num": 7, "venue": "Roest", "wheelchair": true, "tags": ["Soul", "Pop"], "desc": "Doris Vosters maakt soulpop geïnspireerd op artiesten als Jordan Rakei en Olivia Dean. Haar muziek geeft lading aan de kleinste gebeurtenissen, verpakt met een livesound en elektronische elementen. Ze zoekt de diepte in nuchterheid en deelt in haar show de lange reis naar het doorbreken van perfectionisme, het zoeken naar richting en weerbaar worden.", "media": {"Spotify": "https://open.spotify.com/artist/4g4WlP6okyN27pzkAOaT3b?si=_XQqYGdnQIGT1nOJLacpPQ", "Instagram": "https://www.instagram.com/dorisvosters/", "Bandcamp": "https://dorisvosters.bandcamp.com/"}}, {"time": "21:15", "id": "36557", "name": "Eyesores", "num": 14, "venue": "Alkmaars Bierhuis", "wheelchair": false, "tags": ["Punk"], "desc": "Van een storend object wil je het liefst wegkijken, maar Eyesores blijven op je netvlies staan. Niet omdat ze mooi zijn, maar omdat het schuurt. Precies zo houdt Eyesores je een spiegel voor die je het liefst kapot maakt. Deze confrontatiedrang vertaalt zich in snelle, overgoten met benzine en in brand gestoken garagepunk-tracks.", "media": {"Website": "https://linktr.ee/eyesoresband?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQMMjU2MjgxMDQwNTU4AAGnsbUr59gb7hDkCFPJvxtPGcr9XwgVbA3YuRn-K6oV0yYwyUFGZ5UuSNGcg0Y_aem_BOV5efwrZ8iRBo3JrAL3kQ", "Spotify": "https://open.spotify.com/artist/1ZX6BVHmO2euWv2YrcHPks?si=F2SB8ThwQPSPkpafJj9E9g", "Instagram": "https://www.instagram.com/eyesoresband/", "YouTube": "https://www.youtube.com/@eyesoresband/videos"}}, {"time": "21:15", "id": "37653", "name": "MAHA", "num": 15, "venue": "The Boules Club", "wheelchair": true, "tags": ["Post-Punk"], "desc": "MAHA is een Soedanese multidisciplinaire artiest en zine-uitgever gevestigd in Nederland. De afgelopen jaren heeft MAHA haarzelf opnieuw uitgevonden als punkartiest en oprichter van Mahazine. MAHA's missie is om haar creativiteit in te zetten als middel tot verzet tegen onderdrukking, vooroordelen en als een viering van zelfexpressie en gemeenschap", "media": {"Spotify": "https://open.spotify.com/artist/5gPTyE1PeMWs2oVCtwY4G4?si=MK50BiS2QYyxGJ6lr4metg", "Instagram": "https://www.instagram.com/mahaeljak/", "YouTube": "https://www.youtube.com/channel/UCQ0djIYYeNqwZX1CHpkPYPA"}}, {"time": "21:30", "id": "36989", "name": "DE FORMULE", "num": 9, "venue": "Café De Tuin", "wheelchair": false, "tags": ["Drum & Bass", "Punk"], "desc": "DE FORMULE will make nights last forever, by combining Electronic music with the raw energy of a band.\nMixing songs like a DJ, but with the power of a Punk band. Inspired by Noisia and Limp Bizkit, DE FORMULE makes sure the crowd won’t stop moving.", "media": {"Website": "https://Deformuleofficial.com", "Instagram": "https://www.instagram.com/deformuleofficial/", "YouTube": "https://www.youtube.com/@deformuleofficial", "Soundcloud": "https://soundcloud.com/deformuleofficial"}}, {"time": "21:30", "id": "37651", "name": "girlhead", "num": 17, "venue": "Podium Victorie", "wheelchair": true, "tags": ["Shoegaze", "Alternative"], "desc": "girlhead is een dreampop- en shoegazeband met leden uit Den Haag en Amsterdam die de mistige klankwerelden van Slowdive en Cocteau Twins combineert met het zwaardere randje van Deftones. Hun muziek beweegt tussen dromerige dissonantie en emotionele helderheid, waar kwetsbaarheid en volume samenkomen.", "media": {"Website": "https://subscribepage.io/girlheadband", "Instagram": "https://www.instagram.com/girlhead.wav", "YouTube": "https://www.youtube.com/@girlheadband", "Soundcloud": "https://soundcloud.com/girlheadband", "Bandcamp": "https://girlheadband.bandcamp.com"}}, {"time": "21:30", "id": "36503", "name": "Mick Spek", "num": 3, "venue": "VEER", "wheelchair": true, "tags": ["Hip Hop", "Pop"], "desc": "Mick Spek is wat je krijgt als je nonchalance mixt met ** goed rappen. Een jongen van\nhet dorp met ambities in het land. Mick is bezig is met zijn 3e solo-(hiphop)album,\ndaarnaast schrijft en produceert hij voor namen als Antoon, Bankzitters, Ritse, Hef etc.\nMet een meeuw als beattag, herken je zijn werk overal.", "media": {"Website": "https://mickspek.nl", "Spotify": "https://open.spotify.com/artist/23mbvDIZJjSK4y4KhwlnHi?si=uoE_zXk5QU6r4Qp10z5pvg", "Instagram": "https://www.instagram.com/mickspek", "YouTube": "https://www.youtube.com/@SpekMick"}}, {"time": "21:45", "id": "36835", "name": "Else Lena", "num": 11, "venue": "Café Klunder", "wheelchair": true, "tags": ["Pop", "Kleinkunst"], "desc": "Orkestrale Nederlandstalige Kleinkunst-pop\nVerhalend, eigenzinnig, kwetsbaar en indringend. Else Lena neemt je moeiteloos mee in haar fantasierijke wereld. Voor de één herkenbaar, voor de ander een nieuw perspectief. Live krijgen haar nummers een extra dimensie, met arrangementen die variëren van klein en intiem tot groots en meeslepend.", "media": {"Spotify": "https://open.spotify.com/artist/6z3MeKgMc8aefi1TRFlvbe?si=OtTpkNH8RjSA1QJjYVHk-A", "Instagram": "https://www.instagram.com/elselenaaa/", "YouTube": "https://www.youtube.com/@elselenaaaa/videos"}}, {"time": "22:00", "id": "37107", "name": "FEMI", "num": 8, "venue": "Bibliotheek Alkmaar Centrum", "wheelchair": true, "tags": ["Folk", "Indie"], "desc": "Met haar eerlijke teksten neemt FEMI je mee in een gelaagde wereld van alternatieve folk. Geïnspireerd door Big Thief, Patrick Watson en Bob Dylan, verweeft ze persoonlijke verhalen met klassieke en moderne invloeden. Na de release van haar debuut-EP ‘Deadline’, kwam in oktober haar nieuwe single \"milk song\" uit.", "media": {"Spotify": "https://open.spotify.com/artist/0d4PHPVdZaJylLDOJUd2Yw?si=rC_LvUnjStKV2LTIEcJmmA", "Instagram": "https://www.instagram.com/femi.music", "YouTube": "https://youtube.com/@itsfemimusic?si=bjvDmCwEk-UanjV4"}}, {"time": "22:00", "id": "37244", "name": "Lucy Fabienne", "num": 12, "venue": "'t Hoekje", "wheelchair": false, "tags": ["Pop", "Country"], "desc": "Lucy Fabienne maakt country-pop voor dwalende harten en wannabe cowboys. Met haar kenmerkende vibrato zingt ze over opgroeien in een klein dorp, mentale problemen en het geloof. Haar missie is om buitenbeentjes een veilige haven te bieden. Eerder stond zij al op podia als 013, Het Paard en De Helling.", "media": {"Spotify": "https://open.spotify.com/artist/2N8YfPuSR8FkNYGoz5mqVv?si=O9qVTmZiTxC910Q3cX1Iuw", "Instagram": "https://www.instagram.com/lucyfabiennemusic?igsh=MW91bTFkcmppbHNwdg%3D%3D&utm_source=qr", "YouTube": "https://youtu.be/0HXeFnQ6xFA?is=1Moi41i8PZTfHzxJ"}}, {"time": "22:15", "id": "36243", "name": "Wendy Moore", "num": 16, "venue": "De Pilaren", "wheelchair": false, "tags": ["Alternative", "Pop"], "desc": "Donkere gitaar gedreven alt-pop, rauwe emoties en songs die onder je huid kruipen. Wendy Moore maakt muziek die voelt als een lichtpunt in het donker. Met optredens van Berlijn tot China geeft ze een stem aan dromers, buitenbeentjes en iedereen die zich ooit onzichtbaar voelde. Haar boodschap is simpel: You are seen, You are heard, and you belong.", "media": {"Website": "https://wendymoore.eu", "Spotify": "https://open.spotify.com/artist/3hVaUYcJaBFuGQim6qmC6l?si=-uW8_r9iQX6PeelkXSKVsA", "Instagram": "https://www.instagram.com/wendymooremusic/", "YouTube": "https://www.youtube.com/channel/UCIM_pjKmannvvP1pXOSg6mw?view_as=subscriber"}}, {"time": "22:30", "id": "37025", "name": "Grandad", "num": 6, "venue": "HAL25", "wheelchair": true, "tags": ["Post-Punk", "Avantgarde"], "desc": "Tik-tak-tik-tak. Avant-garde rock, gehuld in orde en chaos. We vertellen je een verhaal onder begeleiding van een saxofoon. We brengen je een psychose aan geluid waarvan je opa zou neervallen.", "media": {"Spotify": "https://open.spotify.com/artist/3cYgV9Bxor0DFHme9eLbD0?si=TTISq7cET_GXW1FMA8SX5Q", "Instagram": "https://www.instagram.com/grandad_band/", "YouTube": "https://www.youtube.com/@grandadband", "Bandcamp": "https://grandad.bandcamp.com/"}}, {"time": "22:30", "id": "36934", "name": "tenderblom", "num": 15, "venue": "The Boules Club", "wheelchair": true, "tags": ["Hyperpop", "Pop"], "desc": "tenderblom is het solo project van Tender Blom (10 jaar gitarist/zanger bij Pip Blom).\nAls producer van projecten voor Tom Forever en Lena Hessels heb ik ontdekt hoeveel voldoening ik krijg uit het maken van muziek. Nu wil ik presenteren hoe het klinkt als ik alle keuzes in handen heb.", "media": {"Website": "https://tenderblom.nl", "Spotify": "https://open.spotify.com/artist/4dMNV1VtL3ST2YgEJhzxKl?si=ft25_MEcTWygXengYhFn6A", "Instagram": "https://instagram.com/tenderblom"}}, {"time": "22:30", "id": "37235", "name": "The Hook", "num": 5, "venue": "'t Ossehoofd", "wheelchair": false, "tags": ["Rock", "Alternative"], "desc": "The Hook is een energiek rocktrio uit Utrecht dat staat voor melodieuze gitaarrock met pakkende hooks en een aangrijpende en energieke live-drive. In 2025 verscheen hun debuut-EP op het legendarische Kelt Records. Daarnaast speelden ze door heel het land als voorprogramma van Daryll-Ann en Claw Boys Claw, wat hen lovende reacties en recensies opleverde.", "media": {"Spotify": "https://open.spotify.com/artist/66y3ZygySfpK16S3oZvumu?si=Zw-X2hqGQyy2s81xThDkpg", "Instagram": "https://www.instagram.com/thehook.band/", "YouTube": "https://www.youtube.com/@TheHook_official"}}, {"time": "22:45", "id": "36410", "name": "F.I.X.", "num": 14, "venue": "Alkmaars Bierhuis", "wheelchair": false, "tags": ["Hard rock", "Psychedelic"], "desc": "Destructieve arrangementen en besmettelijke bewegingen. F.I.X. Is een 5-koppige groep met hun wortels in je jaren 60 & 70 heavy rock. Denk aan Blue Cheer & Cactus vóór hun. Snijdende solo’s, dansbare groove en naast het opjutten van het publiek probeert de frontman met beladen onderwerpen bewustwording te creëren.", "media": {"Spotify": "https://open.spotify.com/artist/4NWDPe87t2vGT8IpC1XGrv?si=QjuNVSx-ThyzMrTx2NEpmg", "Instagram": "https://www.instagram.com/f.i.x.official?igsh=bTl1NDRlbnRuYXNm"}}, {"time": "23:00", "id": "37395", "name": "De Plaag", "num": 9, "venue": "Café De Tuin", "wheelchair": false, "tags": ["Punk", "Electro"], "desc": "De Nederlandstalige Electro/Punk band De Plaag lijkt op het eerste gezicht op een uit de hand gelopen swingers party.  Poëtisch met een vieze rand, brutaal waar het kan en gevoelig waar het moet. Poedelnaakte chaos in het donker, De Plaag geeft zich bloot.  Een show van De Plaag blijft plakken op je netvlies als een zuigzoen in je nek.", "media": {"Website": "https://deplaag.nl", "Spotify": "https://open.spotify.com/artist/5ezJSYbBLR78v7cKsoC46d", "Instagram": "https://instagram.com/deplaag", "YouTube": "https://www.youtube.com/@DePlaag"}}, {"time": "23:00", "id": "36937", "name": "KRAM", "num": 17, "venue": "Podium Victorie", "wheelchair": true, "tags": ["Alternative"], "desc": "KRAM is een Iers-Nederlandse alternative/post-punk band uit Amsterdam, gedreven door urgentie, spanning en collectieve ontlading. Vanuit hun overtuiging ‘Love Stands Forever’ zoeken ze in hun muziek en live shows naar verbinding in een verdeelde wereld. Bekend om hun ijzersterke, explosieve en verbindende liveshows wonnen ze in 2025 de Amsterdamse Popprijs.", "media": {"Instagram": "https://www.instagram.com/kram4ever/", "YouTube": "https://www.youtube.com/@ihatekramtoo"}}, {"time": "23:00", "id": "37530", "name": "Magazines", "num": 13, "venue": "Rockville", "wheelchair": true, "tags": ["Post-Punk"], "desc": "Magazines is een punchy post-punk trio met een onstuitbare drang om alles kapot te spelen. Hun songs zijn rauw, eerlijk en vol adrenaline; het resultaat van drie mensen die alles zelf doen en nergens op wachten.", "media": {"Website": "https://www.magazinesofficial.com", "Spotify": "https://open.spotify.com/artist/24YiCboyRa5iK3cHYgzjaz?si=iWccoV63TuORPp7s4KeJvA", "Instagram": "https://www.instagram.com/magazines.band/", "YouTube": "https://www.youtube.com/@Magazinestheband"}}, {"time": "23:15", "id": "37518", "name": "KUZKO", "num": 10, "venue": "Café Stapper", "wheelchair": false, "tags": ["Electro", "Pop"], "desc": "hey, wij zijn KUZKO een duo geboren uit liefde voor edgy electropop. we mixen popvocals met harde electronische producties. voor fans van Kim Pertras, Underscores & Confidence Man.\nverwacht een energieke catchy clubshow. we know it's going to be hot now that you're coming💋. *let op: goed hydrateren voor en na de show*", "media": {"Website": "https://wearekuzko.com", "Spotify": "https://open.spotify.com/artist/1XwtSHxSZ06XfQ0qah9Rxo?si=zNIdl2eiTaWyejsVMReFJQ", "Instagram": "https://www.instagram.com/wearekuzko/?hl=en", "YouTube": "https://www.youtube.com/@wearekuzko"}}, {"time": "00:00", "id": "37402", "name": "theo artz", "num": 15, "venue": "The Boules Club", "wheelchair": true, "tags": ["Soul"], "desc": "Zijn ingetogen houding maar uitbundige muziek zijn totale tegenpolen, toch weet Theo zichzelf volledig te uiten in teksten en beats die als niemand anders klinken. In zijn nieuwe muziek zoekt hij de randjes op van distortion, tempomodulatie en vintage gear. Hij omschrijft de sound zelf als ‘goofy, op de goeie manier'.", "media": {"Website": "https://theoartz.channel", "Spotify": "https://open.spotify.com/artist/3eiT9L7vDW31nH9ufEL7Nb?si=AT9NfWIfR9WdEGyZ7xRa5w", "Instagram": "https://www.instagram.com/_theoartz_"}}, {"time": "00:30", "id": "37017", "name": "The Robots Are Coming", "num": 17, "venue": "Podium Victorie", "wheelchair": true, "tags": ["Electro"], "desc": "Electroduo uit Tilburg met energieke liveshow vol synthesizers, drummachines, gitaren en een eigen ontworpen lichtshow. TRAC klinkt cinematisch, duister, futuristisch en dansbaar (inspiratie o.a. Daft Punk / Justice). Winnaars 3voor12/Tilburg Song of the Year met het dystopische conceptalbum “2095” en eerder te zien op o.a. Best Kept Secret Festival.", "media": {"Website": "https://therobotsarecoming.nl/", "Spotify": "https://open.spotify.com/artist/7DRcEWHm2imGFbL1ADdl2i?si=gt965cNwQiOtmqV4xqkRNQ", "Instagram": "https://www.instagram.com/therobotsarecomingmusic/", "YouTube": "https://www.youtube.com/@therobotsarecoming", "Bandcamp": "https://therobotsarecoming.bandcamp.com/"}}];
-const ORDER = ["Spotify","YouTube","Bandcamp","Soundcloud","Website","Instagram"];
-const STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
-let view = "tl", genre = null, onlyFav = false;
-let favs = new Set();
-try { favs = new Set(JSON.parse(localStorage.getItem("pr-alk-favs") || "[]")); } catch (e) {}
-try { const v = localStorage.getItem("pr-alk-view"); if (v) view = v; } catch (e) {}
-const save = () => { try { localStorage.setItem("pr-alk-favs", JSON.stringify([...favs])); localStorage.setItem("pr-alk-view", view); } catch (e) {} };
+<div class="player" id="player" hidden>
+  <button type="button" class="play" id="p-toggle" aria-label="Pauze"></button>
+  <div class="pinfo"><span class="pname" id="p-name"></span><span class="psub" id="p-sub"></span><div class="bar"><i id="p-bar"></i></div></div>
+  <button type="button" class="pclose" id="p-close" aria-label="Stop">×</button>
+</div>
+<audio id="audio" preload="none"></audio>
 
-const mins = t => { const [h, m] = t.split(":").map(Number); return (h < 12 ? h + 24 : h) * 60 + m; };
-ACTS.forEach(a => a.m = mins(a.time));
+<script>
+const ACTS = [{"time": "18:30", "id": "37416", "name": "Lola Louii", "num": 1, "venue": "Gunnery's", "wheelchair": false, "tags": ["Pop", "Alternative"], "desc": "Lola Louii is een singer-songwriter die neo-soul en alt-pop mixt alsof je meeleest in haar dagboek. Haar songs zijn eerlijk, vol gelaagde analogieën waarin ze haar gedachten en gevoelens ontleedt. Met een mix van echte instrumenten, elektronische producties en speelse grooves trekt ze je live haar innerwereld in.", "audio": "https://images.popronde.nl/files/b37a6d3d-4d4e-40df-9d2a-1bc261a4fece.mp3", "media": {"Spotify": "https://open.spotify.com/artist/6QPGfku2I1aZz09R0fd6K1?si=tsGttkYQR4qX2EckJHoU1g", "Instagram": "https://www.instagram.com/lolalouii?igsh=MTl2ZjB1c2hldmdmcA%3D%3D&utm_source=qr", "YouTube": "https://www.youtube.com/channel/UCh3RiIRPLnJ9GMbmTy154HA", "Soundcloud": "https://on.soundcloud.com/NeuYSUG3a0YWeVh4LC"}}, {"time": "19:00", "id": "36902", "name": "Amelie Spinks", "num": 2, "venue": "Downtown", "wheelchair": true, "tags": ["Folk", "Indie"], "desc": "Amsterdam-based indie-folk songwriter Amelie Spinks blends delicate storytelling with her New Zealand country-folk roots. Joined by Adrian Bifano, she creates intimate listening experiences shaped by warmth and vulnerability, following her debut EP Warm Light, ESNS showcase, and 2026 releases.", "audio": null, "media": {"Website": "https://www.ameliespinks.com/", "Spotify": "https://open.spotify.com/artist/2msCn66H8nedyo0JqNg9aH?si=JVAxNAv6RYiwRKp386_2DA", "Instagram": "https://www.instagram.com/ameliespinks/", "Soundcloud": "https://on.soundcloud.com/YKGiMGTYX9ZReTBr9", "Bandcamp": "https://ameliespinks.bandcamp.com/"}}, {"time": "19:00", "id": "36727", "name": "Toobss", "num": 3, "venue": "VEER", "wheelchair": true, "tags": ["Afrobeat", "Hip Hop"], "desc": "Toobss is een Rotterdamse artiest die Afro, Urban en Zouk combineert met een energieke en persoonlijke live-ervaring. Met miljoenen streams en een sterke live-reputatie speelde hij clubs en festivals door het land. Op 26 december 2025 verzorgde hij het voorprogramma van Broederliefde in Ahoy Rotterdam.", "audio": "https://images.popronde.nl/files/86281dfa-9a0e-4940-9929-ce94be31ef84.mp3", "media": {"Spotify": "https://open.spotify.com/artist/0rzkFZ1D0Aayl1ysZnWlpC?si=eEwIQVB2TrqaloHDUFD8Kw", "Instagram": "https://www.instagram.com/toobss__/", "YouTube": "https://www.youtube.com/@toobss"}}, {"time": "19:15", "id": "37367", "name": "YRSA", "num": 4, "venue": "Mojo's Entertainment", "wheelchair": true, "tags": ["Nederlandstalig", "Alternative"], "desc": "YRSA maakt van een mug een olifant met alternatieve pop en poëtische teksten. Ze blaast kleine momenten op tot iets groters en nodigt luisteraars uit om stil te staan bij wat normaal ongemerkt voorbijgaat. Met gelaagde instrumentatie en invloeden van Eefje de Visser, Spinvis en St. Vincent creëert ze een open clubhuis waar mensen samen alleen kunnen zijn.", "audio": "https://images.popronde.nl/files/80bf7a27-79c1-4188-bcd4-5112359da6d3.mp3", "media": {"Website": "https://yrsamarleen.nl", "Spotify": "https://open.spotify.com/artist/5BLCBw3ZwkvqyUuUtozq2h?si=t_5l4oZbTWifyfFIhTMFFw", "Instagram": "https://www.instagram.com/yrsamarleen/", "YouTube": "https://open.spotify.com/artist/5BLCBw3ZwkvqyUuUtozq2h?si=t_5l4oZbTWifyfFIhTMFFw"}}, {"time": "19:30", "id": "36247", "name": "Calis Nyarko", "num": 7, "venue": "Roest", "wheelchair": true, "tags": ["House", "Dance"], "desc": "Calis Nyarko is een Gospel House-artiest van West-Afrikaanse afkomst, bekend om zijn unieke vermogen om de zielvolle essentie van gospel te combineren met de dynamische energie van elektronische muziek. Calis smelt live instrumentatie saxofoon, drumpad en toetsen samen met dynamische elektronische producties om een meeslepende muzikale ervaring te creëren.", "audio": "https://images.popronde.nl/files/52f1ff05-1faa-4fdf-ba52-efa8a5f86d79.mp3", "media": {"Website": "https://cream-collective.eu/music/#:~:text=and%20John%20Coltrane.-,CALIS%20NYARKO,-Calis%20Nyarko%20is", "Spotify": "https://open.spotify.com/track/1FOvh2PhCqk94ZSJ0AOHqE?si=4fd4d73a813b44d1", "Instagram": "https://www.instagram.com/calisnyarko/"}}, {"time": "19:30", "id": "37281", "name": "HOOFS", "num": 6, "venue": "HAL25", "wheelchair": true, "tags": ["Noise", "Post-Punk"], "desc": "Met een snoeiharde mix van noise en postpunk werd HOOFS door 3voor12 getypeerd als ‘niet voor watjes’. Met intense muziek en shows, die steevast zorgen voor moshpits en collectieve ontlading, vieren ze het leven en creëren ze een plek waar iedereen zichzelf kan zijn. Het geluid is hard, de ruimte zacht. Watjes wees welkom.", "audio": null, "media": {"Spotify": "https://open.spotify.com/artist/4QjLwd8IdqEMvKdkoSE5Bp?si=K4AJnbNoQ4SzRNeCm_TYuA", "Instagram": "https://www.instagram.com/hoofs_music/", "YouTube": "https://www.youtube.com/@hoofs/videos"}}, {"time": "19:30", "id": "37124", "name": "Sterre Jasmine", "num": 5, "venue": "'t Ossehoofd", "wheelchair": false, "tags": ["Country", "Pop"], "desc": "Sterre Jasmine is een 23-jarige country pop artiest. Haar muziek is een mix van intieme country storytelling en energieke pop hooks. In een wereld waar stilte vaak het veiligst voelt, kiest Sterre ervoor om te zingen en verhalen te delen die mensen écht raken en verbinden. Geïnspireerd door Kacey Musgraves, Dolly Parton en The Chicks.", "audio": null, "media": {"Website": "https://www.sterrejasmine.com", "Instagram": "https://www.instagram.com/sterrejasmine_/", "YouTube": "https://www.youtube.com/@sterre.jasmine"}}, {"time": "20:00", "id": "36723", "name": "De Zweefclub", "num": 17, "venue": "Podium Victorie", "wheelchair": true, "tags": ["Indie"], "desc": "De Zweefclub maakt knutselpop: luid en lief, strak en geknutseld. Onvoorspelbare muziek vol humor, new wave- en punk-invloeden, met een zachte ondertoon. De liedjes gaan over: vliegeren, diepzeeduiken, polkadansen, modderworstelen en uitslapen. \n\nNa de winst van de Grote Prijs Van Nederland en een volle zaal op Noorderslag, zijn ze klaar voor eeuwige roem.", "audio": null, "media": {"Website": "https://www.dezweef.club", "Spotify": "https://open.spotify.com/artist/67bciYwiIDwTuPynYTV44x?si=gXlFGRDtSBaMomktf4CeiQ", "Instagram": "https://www.instagram.com/dezweefclub/", "YouTube": "https://www.youtube.com/@dezweefclub", "Bandcamp": "https://dezweefclub.bandcamp.com/"}}, {"time": "20:00", "id": "36817", "name": "Maxime", "num": 8, "venue": "Bibliotheek Alkmaar Centrum", "wheelchair": true, "tags": ["Singer/songwriter", "Indie"], "desc": "Muziek is voor Maxime een plek van begrip, een omhelzing voor de ziel. Ze maakt Nederlandstalige indiepop waarbij klassieke elementen zoals akoestische gitaar, piano en meerstemmigheid samenkomen met elektronische invloeden. Meeslepend, doordacht en bedoeld om te raken. Denk Billie Eilish, Raye, MARO en Froukje. Te boeken als solo- of duo-act.", "audio": "https://images.popronde.nl/files/7b97b82a-41a3-4ecb-a41c-e833fd1ebb79.mp3", "media": {"Spotify": "https://open.spotify.com/artist/67ijcDBwFthXo6WRpEl6kR?si=HzREY2bCQu6mz8DwGUB54g", "Instagram": "https://www.instagram.com/maks.maxime", "YouTube": "https://www.youtube.com/@maks.maxime"}}, {"time": "20:15", "id": "37536", "name": "Gilly", "num": 3, "venue": "VEER", "wheelchair": true, "tags": ["Hip Hop", "Pop"], "desc": "Gilly, het gezicht van noord neemt je mee in verhalen echte verhalen uit het leven, de buurt en de stad. Opgegroeid in de aandachtswijk Tilburg Noord is Gilly opgegroeid tussen verschillende invloeden en keuzes die hem gevormd hebben. Hij heeft veel gezien, het vallen en opstaan van mensen in de wijk, mensen zien groeien en afbrokkelen. De realiteit van de o", "audio": null, "media": {"Spotify": "https://open.spotify.com/artist/5P6kllyzE7PLpjJECO5LnN?si=oXyruedcSryUdmqCMqruDA", "Instagram": "https://www.instagram.com/gillynoord/", "YouTube": "https://youtube.com/@hetgezichtvannoord?si=BPcHm1nVokgK2-EC"}}, {"time": "20:15", "id": "37243", "name": "WABR", "num": 9, "venue": "Café De Tuin", "wheelchair": false, "tags": ["Electro", "Nederlandstalig"], "desc": "WABR zoekt in Nederlandse teksten en speelse elektronische muziek naar de balans tussen realiteit en simulatie. Ontstaan in onze slaapkamerstudio met één regel: we zeggen altijd ja. \nDe invloeden lopen van Mura Masa tot Doe Maar en retro game-muziek. We bespreken dokters, tijdgebrek en allerlei andere vage zaken. Neem het niet te serieus, of juist wel.", "audio": "https://images.popronde.nl/files/66aeefe1-14e9-4baf-9947-9e7a64f41077.mp3", "media": {"Website": "https://linktr.ee/wabrwabr", "Spotify": "https://open.spotify.com/artist/3oOqFzbLfXGYSCr0nJCtIx?si=F4HeqKRVS32WPsixFmmSHg", "Instagram": "https://www.instagram.com/wabrwabr/", "YouTube": "https://www.youtube.com/@WABRWABR"}}, {"time": "20:30", "id": "37534", "name": "ARA", "num": 11, "venue": "Café Klunder", "wheelchair": true, "tags": ["Singer/songwriter", "Folk"], "desc": "Tussen ruïnes en het heden laat Ara oude klanken opnieuw ademen. Vanuit zijn Armeense achtergrond bouwt hij een bijzonder geluid waarin folk, pop en filmische invloeden samenkomen. Nadat zijn debuut EP weerklank vond in Nederland, Armenië en Los Angeles, speelde Ara support shows voor o.a. Racoon en ook eigen shows in binnen- en buitenland.", "audio": "https://images.popronde.nl/files/96f7253a-b0e0-47f7-a382-8fbe30f68b71.mp3", "media": {"Website": "https://www.aramusic.art/", "Spotify": "https://open.spotify.com/artist/7eMq20o4L2IGNOa4AVugMr?si=G1hiElaVSG6gbPDUSBx_ew", "Instagram": "https://www.instagram.com/aramusic", "YouTube": "https://www.youtube.com/@AraMusic27"}}, {"time": "20:30", "id": "36521", "name": "Marieke Schenk", "num": 10, "venue": "Café Stapper", "wheelchair": false, "tags": ["Pop", "Nederlandstalig"], "desc": "Marieke Schenk: een popartiest met een krachtige, energieke liveshow. Ze stond op de ESNS '26 line-up en speelt op grote festivals. Debuutsingle Verward Persoon (38K streams) ging viraal op TikTok. Nieuwe muziek kreeg airplay op 3FM. Gemixt met rock maakt ze rauwe, catchy songs, geïnspireerd door Pommelien Thijs, voor wie ze de aftershow speelde in AFAS Live", "audio": "https://images.popronde.nl/files/409e40c2-40f3-4c9e-8f5f-5d64ee01bf51.mp3", "media": {"Website": "https://www.mariekeschenk.nl", "Spotify": "https://open.spotify.com/artist/0SYFuJ8cP1yG4Xp88SjEcb?si=WWTKCCPbQ6K2SHdVVI2JVA", "Instagram": "https://www.instagram.com/marieke.schenk", "YouTube": "https://www.youtube.com/results?search_query=marieke+schenk"}}, {"time": "20:30", "id": "37509", "name": "Mees", "num": 12, "venue": "'t Hoekje", "wheelchair": false, "tags": ["Pop", "Nederlandstalig"], "desc": "Mees is een Rotterdamse zanger die pop, hiphop en levenslied naar zijn hand zet. Wat begint op de piano groeit uit tot energieke liveshows. In 2025 speelde hij zijn eerste festivals en deed hij als voorprogramma de volledige clubtour van Kraantje Pappie. Hij is getekend bij platenlabel Top Notch en bracht daar zijn debuut-EP ‘Hoofd in de wolken’ uit.", "audio": null, "media": {"Website": "https://www.madebymeesmusic.nl/", "Spotify": "https://open.spotify.com/artist/69JBEM02xkpzdC6nuafOiI?si=JwQ9Y2unQpSyZ4EKwXilcw", "Instagram": "https://www.instagram.com/madebymees/"}}, {"time": "20:45", "id": "36626", "name": "Marit Nygård en de Medemensen", "num": 2, "venue": "Downtown", "wheelchair": true, "tags": ["Kleinkunst", "Indie"], "desc": "Met twee voeten in de modder hebben Marit Nygård en de Medemensen veel vragen en weinig antwoorden. De zoektocht naar een beetje richting vertaalt zich naar catchy kleinkunst over rennen, vastlopen en de wens naar meer zachtheid. Ze speelden al meer dan 100 shows, van ESNS tot op een bootje. Stap in de bakfiets van de Medemensen en kom fluitend verdwalen!", "audio": "https://images.popronde.nl/files/d3ad7f46-723a-4f8a-a78d-2660ae604852.mp3", "media": {"Website": "https://maritnygard.com/", "Spotify": "https://open.spotify.com/artist/4FKvA5jaSSTDdt0AW0Jeqx?si=XOmQXkrsQT-HCSA8ykFDqQ", "Instagram": "https://www.instagram.com/marit.nygard/", "YouTube": "https://www.youtube.com/@marit_nygard", "Bandcamp": "https://maritnygard.bandcamp.com/"}}, {"time": "21:00", "id": "36943", "name": "Anna Joan", "num": 6, "venue": "HAL25", "wheelchair": true, "tags": ["Alternative", "Pop"], "desc": "A multi-talented showstopper. Drawing inspiration from artists like FKA Twigs, COBRAH and Sevdaliza, Anna Joan is set to unleash her raw, dark electronic sound in '26. Her new, self-produced EP 'SKIN' is a sonic manifesto of sexual liberation. In her electronic performances she blends dance, live-music and outstanding vocal performances in a raw soundworld.", "audio": "https://images.popronde.nl/files/16708635-2320-4e50-bdd5-cc38248865b0.mp3", "media": {"Website": "https://www.annajoan.com", "Spotify": "https://open.spotify.com/album/5q9WWoWeiYOimabwqCvRTy?si=5tDxSTevSxCB5kFpgmYOmg", "Instagram": "https://www.instagram.com/annajoanofficial/", "YouTube": "https://www.youtube.com/channel/UCotr5oglGFhGUAsdcq47fsg?view_as=subscriber", "Soundcloud": "https://soundcloud.com/annajoanofficial", "Bandcamp": "https://annajoan.bandcamp.com"}}, {"time": "21:00", "id": "36259", "name": "crashing", "num": 13, "venue": "Rockville", "wheelchair": true, "tags": ["Shoegaze", "Alternative"], "desc": "Geïnspireerd door shoegaze en alt-rock giganten als Dinosaur Jr. en My Bloody Valentine grijpt Crashing je met een mix van galmende, intense hooks en puur oorverdovend volume met een sterke nadruk op DIY cultuur. Bereid je voor op meeslepende noise en songs met harde impact, ontworpen om zowel gehoord als fysiek gevoeld te worden. Neem oordopjes mee.", "audio": "https://images.popronde.nl/files/625efd3c-766b-4698-ae8f-dc3cd6ecd2cc.mp3", "media": {"Spotify": "https://open.spotify.com/artist/6brUoKxN2RCw6j1aVVIoqr?si=72X92i8sRpOOZCCAJ5W4IA", "Instagram": "https://www.instagram.com/crashingcrashingcrashing/", "YouTube": "https://www.youtube.com/watch?v=H9GN9CgGUK0"}}, {"time": "21:00", "id": "36906", "name": "Loeck", "num": 5, "venue": "'t Ossehoofd", "wheelchair": false, "tags": ["Pop", "Indie"], "desc": "Loeck balanceert tussen softboy en wannabe rockster, chaotisch en vol tegenstrijdigheden. Waar zijn uitstraling nonchalant blijft, wringt er iets onder de oppervlakte. Zijn debuut-EP Sobeit. verschijnt in 2026 en draait om één gedachte: “het is maar zo.” Loslaten of doen alsof het je niets raakt.", "audio": "https://images.popronde.nl/files/6e10d185-8fb5-4f4a-ac14-5e373f73bf20.mp3", "media": {"Spotify": "https://open.spotify.com/artist/2U4Qf4bmyxAdEpgM6m8rRk?si=9oH7nWxKQmqsVETUrvTxKw", "Instagram": "https://www.instagram.com/l.oeck/"}}, {"time": "21:00", "id": "36907", "name": "Tessa June", "num": 4, "venue": "Mojo's Entertainment", "wheelchair": true, "tags": ["Pop", "Nederlandstalig"], "desc": "Tessa June maakt NL-pop die raakt. Haar persoonlijke liedjes vinden altijd iets universeels. Na een uitverkochte Cinetol-show ('24) en een clubtour langs Luxor Live, Mezz en Paradiso, volgde in '25 een duet met Niels Destadsbader, werd Meisjes Lopen Sneller opnieuw toegevoegd aan Beste Van NL en bereikte ze 6 miljoen streams. Online bereikt ze 35.000 volgers", "audio": "https://images.popronde.nl/files/eee408bd-492a-44f3-a6f9-eed57bb62256.mp3", "media": {"Website": "https://www.tessajune.nl/", "Spotify": "https://open.spotify.com/artist/67UrL3cZJQ2WhwqdikarKk", "Instagram": "https://www.instagram.com/tessajuneofficial/", "YouTube": "https://youtube.com/@tessajune"}}, {"time": "21:15", "id": "37168", "name": "Doris Vosters", "num": 7, "venue": "Roest", "wheelchair": true, "tags": ["Soul", "Pop"], "desc": "Doris Vosters maakt soulpop geïnspireerd op artiesten als Jordan Rakei en Olivia Dean. Haar muziek geeft lading aan de kleinste gebeurtenissen, verpakt met een livesound en elektronische elementen. Ze zoekt de diepte in nuchterheid en deelt in haar show de lange reis naar het doorbreken van perfectionisme, het zoeken naar richting en weerbaar worden.", "audio": "https://images.popronde.nl/files/21ba3511-053f-4edb-8a67-27867760838a.mp3", "media": {"Spotify": "https://open.spotify.com/artist/4g4WlP6okyN27pzkAOaT3b?si=_XQqYGdnQIGT1nOJLacpPQ", "Instagram": "https://www.instagram.com/dorisvosters/", "Bandcamp": "https://dorisvosters.bandcamp.com/"}}, {"time": "21:15", "id": "36557", "name": "Eyesores", "num": 14, "venue": "Alkmaars Bierhuis", "wheelchair": false, "tags": ["Punk"], "desc": "Van een storend object wil je het liefst wegkijken, maar Eyesores blijven op je netvlies staan. Niet omdat ze mooi zijn, maar omdat het schuurt. Precies zo houdt Eyesores je een spiegel voor die je het liefst kapot maakt. Deze confrontatiedrang vertaalt zich in snelle, overgoten met benzine en in brand gestoken garagepunk-tracks.", "audio": "https://images.popronde.nl/files/7f918dd0-b54f-4e50-8cf4-ac0d2c27c13c.mp3", "media": {"Website": "https://linktr.ee/eyesoresband?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQMMjU2MjgxMDQwNTU4AAGnsbUr59gb7hDkCFPJvxtPGcr9XwgVbA3YuRn-K6oV0yYwyUFGZ5UuSNGcg0Y_aem_BOV5efwrZ8iRBo3JrAL3kQ", "Spotify": "https://open.spotify.com/artist/1ZX6BVHmO2euWv2YrcHPks?si=F2SB8ThwQPSPkpafJj9E9g", "Instagram": "https://www.instagram.com/eyesoresband/", "YouTube": "https://www.youtube.com/@eyesoresband/videos"}}, {"time": "21:15", "id": "37653", "name": "MAHA", "num": 15, "venue": "The Boules Club", "wheelchair": true, "tags": ["Post-Punk"], "desc": "MAHA is een Soedanese multidisciplinaire artiest en zine-uitgever gevestigd in Nederland. De afgelopen jaren heeft MAHA haarzelf opnieuw uitgevonden als punkartiest en oprichter van Mahazine. MAHA's missie is om haar creativiteit in te zetten als middel tot verzet tegen onderdrukking, vooroordelen en als een viering van zelfexpressie en gemeenschap", "audio": null, "media": {"Spotify": "https://open.spotify.com/artist/5gPTyE1PeMWs2oVCtwY4G4?si=MK50BiS2QYyxGJ6lr4metg", "Instagram": "https://www.instagram.com/mahaeljak/", "YouTube": "https://www.youtube.com/channel/UCQ0djIYYeNqwZX1CHpkPYPA"}}, {"time": "21:30", "id": "36989", "name": "DE FORMULE", "num": 9, "venue": "Café De Tuin", "wheelchair": false, "tags": ["Drum & Bass", "Punk"], "desc": "DE FORMULE will make nights last forever, by combining Electronic music with the raw energy of a band.\nMixing songs like a DJ, but with the power of a Punk band. Inspired by Noisia and Limp Bizkit, DE FORMULE makes sure the crowd won’t stop moving.", "audio": "https://images.popronde.nl/files/8971b778-ca14-468e-b11f-216186c8e0d7.mp3", "media": {"Website": "https://Deformuleofficial.com", "Instagram": "https://www.instagram.com/deformuleofficial/", "YouTube": "https://www.youtube.com/@deformuleofficial", "Soundcloud": "https://soundcloud.com/deformuleofficial"}}, {"time": "21:30", "id": "37651", "name": "girlhead", "num": 17, "venue": "Podium Victorie", "wheelchair": true, "tags": ["Shoegaze", "Alternative"], "desc": "girlhead is een dreampop- en shoegazeband met leden uit Den Haag en Amsterdam die de mistige klankwerelden van Slowdive en Cocteau Twins combineert met het zwaardere randje van Deftones. Hun muziek beweegt tussen dromerige dissonantie en emotionele helderheid, waar kwetsbaarheid en volume samenkomen.", "audio": null, "media": {"Website": "https://subscribepage.io/girlheadband", "Instagram": "https://www.instagram.com/girlhead.wav", "YouTube": "https://www.youtube.com/@girlheadband", "Soundcloud": "https://soundcloud.com/girlheadband", "Bandcamp": "https://girlheadband.bandcamp.com"}}, {"time": "21:30", "id": "36503", "name": "Mick Spek", "num": 3, "venue": "VEER", "wheelchair": true, "tags": ["Hip Hop", "Pop"], "desc": "Mick Spek is wat je krijgt als je nonchalance mixt met ** goed rappen. Een jongen van\nhet dorp met ambities in het land. Mick is bezig is met zijn 3e solo-(hiphop)album,\ndaarnaast schrijft en produceert hij voor namen als Antoon, Bankzitters, Ritse, Hef etc.\nMet een meeuw als beattag, herken je zijn werk overal.", "audio": "https://images.popronde.nl/files/58ab7492-5cdc-4622-b3e2-6d49717a1bf5.mp3", "media": {"Website": "https://mickspek.nl", "Spotify": "https://open.spotify.com/artist/23mbvDIZJjSK4y4KhwlnHi?si=uoE_zXk5QU6r4Qp10z5pvg", "Instagram": "https://www.instagram.com/mickspek", "YouTube": "https://www.youtube.com/@SpekMick"}}, {"time": "21:45", "id": "36835", "name": "Else Lena", "num": 11, "venue": "Café Klunder", "wheelchair": true, "tags": ["Pop", "Kleinkunst"], "desc": "Orkestrale Nederlandstalige Kleinkunst-pop\nVerhalend, eigenzinnig, kwetsbaar en indringend. Else Lena neemt je moeiteloos mee in haar fantasierijke wereld. Voor de één herkenbaar, voor de ander een nieuw perspectief. Live krijgen haar nummers een extra dimensie, met arrangementen die variëren van klein en intiem tot groots en meeslepend.", "audio": null, "media": {"Spotify": "https://open.spotify.com/artist/6z3MeKgMc8aefi1TRFlvbe?si=OtTpkNH8RjSA1QJjYVHk-A", "Instagram": "https://www.instagram.com/elselenaaa/", "YouTube": "https://www.youtube.com/@elselenaaaa/videos"}}, {"time": "22:00", "id": "37107", "name": "FEMI", "num": 8, "venue": "Bibliotheek Alkmaar Centrum", "wheelchair": true, "tags": ["Folk", "Indie"], "desc": "Met haar eerlijke teksten neemt FEMI je mee in een gelaagde wereld van alternatieve folk. Geïnspireerd door Big Thief, Patrick Watson en Bob Dylan, verweeft ze persoonlijke verhalen met klassieke en moderne invloeden. Na de release van haar debuut-EP ‘Deadline’, kwam in oktober haar nieuwe single \"milk song\" uit.", "audio": "https://images.popronde.nl/files/2f0e59cc-679a-4b67-99db-27911884272e.mp3", "media": {"Spotify": "https://open.spotify.com/artist/0d4PHPVdZaJylLDOJUd2Yw?si=rC_LvUnjStKV2LTIEcJmmA", "Instagram": "https://www.instagram.com/femi.music", "YouTube": "https://youtube.com/@itsfemimusic?si=bjvDmCwEk-UanjV4"}}, {"time": "22:00", "id": "37244", "name": "Lucy Fabienne", "num": 12, "venue": "'t Hoekje", "wheelchair": false, "tags": ["Pop", "Country"], "desc": "Lucy Fabienne maakt country-pop voor dwalende harten en wannabe cowboys. Met haar kenmerkende vibrato zingt ze over opgroeien in een klein dorp, mentale problemen en het geloof. Haar missie is om buitenbeentjes een veilige haven te bieden. Eerder stond zij al op podia als 013, Het Paard en De Helling.", "audio": "https://images.popronde.nl/files/4c90f8f6-e4c2-49e9-acd9-550de107a1fd.mp3", "media": {"Spotify": "https://open.spotify.com/artist/2N8YfPuSR8FkNYGoz5mqVv?si=O9qVTmZiTxC910Q3cX1Iuw", "Instagram": "https://www.instagram.com/lucyfabiennemusic?igsh=MW91bTFkcmppbHNwdg%3D%3D&utm_source=qr", "YouTube": "https://youtu.be/0HXeFnQ6xFA?is=1Moi41i8PZTfHzxJ"}}, {"time": "22:15", "id": "36243", "name": "Wendy Moore", "num": 16, "venue": "De Pilaren", "wheelchair": false, "tags": ["Alternative", "Pop"], "desc": "Donkere gitaar gedreven alt-pop, rauwe emoties en songs die onder je huid kruipen. Wendy Moore maakt muziek die voelt als een lichtpunt in het donker. Met optredens van Berlijn tot China geeft ze een stem aan dromers, buitenbeentjes en iedereen die zich ooit onzichtbaar voelde. Haar boodschap is simpel: You are seen, You are heard, and you belong.", "audio": "https://images.popronde.nl/files/54e7ae43-4af8-4684-9988-91bfaf36ea28.mp3", "media": {"Website": "https://wendymoore.eu", "Spotify": "https://open.spotify.com/artist/3hVaUYcJaBFuGQim6qmC6l?si=-uW8_r9iQX6PeelkXSKVsA", "Instagram": "https://www.instagram.com/wendymooremusic/", "YouTube": "https://www.youtube.com/channel/UCIM_pjKmannvvP1pXOSg6mw?view_as=subscriber"}}, {"time": "22:30", "id": "37025", "name": "Grandad", "num": 6, "venue": "HAL25", "wheelchair": true, "tags": ["Post-Punk", "Avantgarde"], "desc": "Tik-tak-tik-tak. Avant-garde rock, gehuld in orde en chaos. We vertellen je een verhaal onder begeleiding van een saxofoon. We brengen je een psychose aan geluid waarvan je opa zou neervallen.", "audio": "https://images.popronde.nl/files/f956a0a8-257e-4c94-88ad-87fefb47395c.mp3", "media": {"Spotify": "https://open.spotify.com/artist/3cYgV9Bxor0DFHme9eLbD0?si=TTISq7cET_GXW1FMA8SX5Q", "Instagram": "https://www.instagram.com/grandad_band/", "YouTube": "https://www.youtube.com/@grandadband", "Bandcamp": "https://grandad.bandcamp.com/"}}, {"time": "22:30", "id": "36934", "name": "tenderblom", "num": 15, "venue": "The Boules Club", "wheelchair": true, "tags": ["Hyperpop", "Pop"], "desc": "tenderblom is het solo project van Tender Blom (10 jaar gitarist/zanger bij Pip Blom).\nAls producer van projecten voor Tom Forever en Lena Hessels heb ik ontdekt hoeveel voldoening ik krijg uit het maken van muziek. Nu wil ik presenteren hoe het klinkt als ik alle keuzes in handen heb.", "audio": null, "media": {"Website": "https://tenderblom.nl", "Spotify": "https://open.spotify.com/artist/4dMNV1VtL3ST2YgEJhzxKl?si=ft25_MEcTWygXengYhFn6A", "Instagram": "https://instagram.com/tenderblom"}}, {"time": "22:30", "id": "37235", "name": "The Hook", "num": 5, "venue": "'t Ossehoofd", "wheelchair": false, "tags": ["Rock", "Alternative"], "desc": "The Hook is een energiek rocktrio uit Utrecht dat staat voor melodieuze gitaarrock met pakkende hooks en een aangrijpende en energieke live-drive. In 2025 verscheen hun debuut-EP op het legendarische Kelt Records. Daarnaast speelden ze door heel het land als voorprogramma van Daryll-Ann en Claw Boys Claw, wat hen lovende reacties en recensies opleverde.", "audio": "https://images.popronde.nl/files/3d3d8aad-69a1-4a09-9ff6-f3b51a518572.mp3", "media": {"Spotify": "https://open.spotify.com/artist/66y3ZygySfpK16S3oZvumu?si=Zw-X2hqGQyy2s81xThDkpg", "Instagram": "https://www.instagram.com/thehook.band/", "YouTube": "https://www.youtube.com/@TheHook_official"}}, {"time": "22:45", "id": "36410", "name": "F.I.X.", "num": 14, "venue": "Alkmaars Bierhuis", "wheelchair": false, "tags": ["Hard rock", "Psychedelic"], "desc": "Destructieve arrangementen en besmettelijke bewegingen. F.I.X. Is een 5-koppige groep met hun wortels in je jaren 60 & 70 heavy rock. Denk aan Blue Cheer & Cactus vóór hun. Snijdende solo’s, dansbare groove en naast het opjutten van het publiek probeert de frontman met beladen onderwerpen bewustwording te creëren.", "audio": "https://images.popronde.nl/files/3b9d3651-8a63-4fe6-905d-34d15d6c3e67.mp3", "media": {"Spotify": "https://open.spotify.com/artist/4NWDPe87t2vGT8IpC1XGrv?si=QjuNVSx-ThyzMrTx2NEpmg", "Instagram": "https://www.instagram.com/f.i.x.official?igsh=bTl1NDRlbnRuYXNm"}}, {"time": "23:00", "id": "37395", "name": "De Plaag", "num": 9, "venue": "Café De Tuin", "wheelchair": false, "tags": ["Punk", "Electro"], "desc": "De Nederlandstalige Electro/Punk band De Plaag lijkt op het eerste gezicht op een uit de hand gelopen swingers party.  Poëtisch met een vieze rand, brutaal waar het kan en gevoelig waar het moet. Poedelnaakte chaos in het donker, De Plaag geeft zich bloot.  Een show van De Plaag blijft plakken op je netvlies als een zuigzoen in je nek.", "audio": "https://images.popronde.nl/files/d762a129-0410-4260-be76-e314bf376c7e.mp3", "media": {"Website": "https://deplaag.nl", "Spotify": "https://open.spotify.com/artist/5ezJSYbBLR78v7cKsoC46d", "Instagram": "https://instagram.com/deplaag", "YouTube": "https://www.youtube.com/@DePlaag"}}, {"time": "23:00", "id": "36937", "name": "KRAM", "num": 17, "venue": "Podium Victorie", "wheelchair": true, "tags": ["Alternative"], "desc": "KRAM is een Iers-Nederlandse alternative/post-punk band uit Amsterdam, gedreven door urgentie, spanning en collectieve ontlading. Vanuit hun overtuiging ‘Love Stands Forever’ zoeken ze in hun muziek en live shows naar verbinding in een verdeelde wereld. Bekend om hun ijzersterke, explosieve en verbindende liveshows wonnen ze in 2025 de Amsterdamse Popprijs.", "audio": "https://images.popronde.nl/files/5319bbbe-eeb4-42bd-a18c-91fcc8d019ac.mp3", "media": {"Instagram": "https://www.instagram.com/kram4ever/", "YouTube": "https://www.youtube.com/@ihatekramtoo"}}, {"time": "23:00", "id": "37530", "name": "Magazines", "num": 13, "venue": "Rockville", "wheelchair": true, "tags": ["Post-Punk"], "desc": "Magazines is een punchy post-punk trio met een onstuitbare drang om alles kapot te spelen. Hun songs zijn rauw, eerlijk en vol adrenaline; het resultaat van drie mensen die alles zelf doen en nergens op wachten.", "audio": "https://images.popronde.nl/files/b7e0dfea-cc65-452e-848a-17c1c6fa5af8.mp3", "media": {"Website": "https://www.magazinesofficial.com", "Spotify": "https://open.spotify.com/artist/24YiCboyRa5iK3cHYgzjaz?si=iWccoV63TuORPp7s4KeJvA", "Instagram": "https://www.instagram.com/magazines.band/", "YouTube": "https://www.youtube.com/@Magazinestheband"}}, {"time": "23:15", "id": "37518", "name": "KUZKO", "num": 10, "venue": "Café Stapper", "wheelchair": false, "tags": ["Electro", "Pop"], "desc": "hey, wij zijn KUZKO een duo geboren uit liefde voor edgy electropop. we mixen popvocals met harde electronische producties. voor fans van Kim Pertras, Underscores & Confidence Man.\nverwacht een energieke catchy clubshow. we know it's going to be hot now that you're coming💋. *let op: goed hydrateren voor en na de show*", "audio": "https://images.popronde.nl/files/0379b862-d044-448a-93c8-c4d82267eba0.mp3", "media": {"Website": "https://wearekuzko.com", "Spotify": "https://open.spotify.com/artist/1XwtSHxSZ06XfQ0qah9Rxo?si=zNIdl2eiTaWyejsVMReFJQ", "Instagram": "https://www.instagram.com/wearekuzko/?hl=en", "YouTube": "https://www.youtube.com/@wearekuzko"}}, {"time": "00:00", "id": "37402", "name": "theo artz", "num": 15, "venue": "The Boules Club", "wheelchair": true, "tags": ["Soul"], "desc": "Zijn ingetogen houding maar uitbundige muziek zijn totale tegenpolen, toch weet Theo zichzelf volledig te uiten in teksten en beats die als niemand anders klinken. In zijn nieuwe muziek zoekt hij de randjes op van distortion, tempomodulatie en vintage gear. Hij omschrijft de sound zelf als ‘goofy, op de goeie manier'.", "audio": "https://images.popronde.nl/files/b98a37e9-cd2b-478b-a805-b3536ad911bc.mp3", "media": {"Website": "https://theoartz.channel", "Spotify": "https://open.spotify.com/artist/3eiT9L7vDW31nH9ufEL7Nb?si=AT9NfWIfR9WdEGyZ7xRa5w", "Instagram": "https://www.instagram.com/_theoartz_"}}, {"time": "00:30", "id": "37017", "name": "The Robots Are Coming", "num": 17, "venue": "Podium Victorie", "wheelchair": true, "tags": ["Electro"], "desc": "Electroduo uit Tilburg met energieke liveshow vol synthesizers, drummachines, gitaren en een eigen ontworpen lichtshow. TRAC klinkt cinematisch, duister, futuristisch en dansbaar (inspiratie o.a. Daft Punk / Justice). Winnaars 3voor12/Tilburg Song of the Year met het dystopische conceptalbum “2095” en eerder te zien op o.a. Best Kept Secret Festival.", "audio": "https://images.popronde.nl/files/fb64c0e3-f8f2-4550-8f06-454bb877312f.mp3", "media": {"Website": "https://therobotsarecoming.nl/", "Spotify": "https://open.spotify.com/artist/7DRcEWHm2imGFbL1ADdl2i?si=gt965cNwQiOtmqV4xqkRNQ", "Instagram": "https://www.instagram.com/therobotsarecomingmusic/", "YouTube": "https://www.youtube.com/@therobotsarecoming", "Bandcamp": "https://therobotsarecoming.bandcamp.com/"}}];
+const ICON_PLAY = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9.5-5.5z"/></svg>';
+const ICON_PAUSE = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 2.5h3.2v11H3.5zM9.3 2.5h3.2v11H9.3z"/></svg>';
+const ICON_STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
+const LINKS = [["Spotify","Spotify"],["YouTube","YouTube"],["Bandcamp","Bandcamp"],["Soundcloud","SoundCloud"],["Website","Website"],["Instagram","Instagram"]];
+const SET = 45;
+
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+let view = store.get("pra-view", "lineup");
+let favs = new Set(store.get("pra-favs", []));
+let genre = "", onlyFav = false, playing = null;
+
+const toMin = t => { const [h, m] = t.split(":").map(Number); return (h < 12 ? h + 24 : h) * 60 + m; };
+ACTS.forEach(a => a.m = toMin(a.time));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const venues = [...new Map(ACTS.map(a => [a.num, a.venue])).entries()].sort((a, b) => a[0] - b[0]);
+const venues = [...new Map(ACTS.map(a => [a.num, { num: a.num, name: a.venue, acc: a.wheelchair }])).values()].sort((a, b) => a.num - b.num);
 const genres = [...new Set(ACTS.flatMap(a => a.tags))].sort((a, b) => a.localeCompare(b, "nl"));
 
-function visible(a) {
-  if (onlyFav && !favs.has(a.id)) return false;
-  if (genre && !a.tags.includes(genre)) return false;
-  return true;
+function nowMin() {
+  const d = new Date();
+  const day = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+  const m = d.getHours() * 60 + d.getMinutes();
+  if (day === 20261113 && m >= 12 * 60) return m;
+  if (day === 20261114 && m < 4 * 60) return m + 24 * 60;
+  return null;
 }
-function links(a) {
-  const keys = ORDER.filter(k => a.media[k]);
-  return keys.map((k, i) => `<a href="${esc(a.media[k])}" target="_blank" rel="noopener" class="${i === 0 && k !== "Website" && k !== "Instagram" ? "primary" : ""}">${k === "Soundcloud" ? "SoundCloud" : k}</a>`).join("");
+const isNow = a => { const n = nowMin(); return n !== null && n >= a.m && n < a.m + SET; };
+const visible = a => (!onlyFav || favs.has(a.id)) && (!genre || a.tags.includes(genre));
+
+function playBtn(a) {
+  if (!a.audio) return `<span class="play none" title="Geen luistertrack beschikbaar" aria-hidden="true">${ICON_PLAY}</span>`;
+  const on = playing === a.id && !audio.paused;
+  return `<button type="button" class="play ${playing === a.id ? "playing" : ""}" data-play="${a.id}" aria-label="${on ? "Pauzeer" : "Luister naar"} ${esc(a.name)}">${on ? ICON_PAUSE : ICON_PLAY}</button>`;
 }
-function clashes(a) {
-  if (!favs.has(a.id)) return [];
-  return ACTS.filter(b => b.id !== a.id && favs.has(b.id) && Math.abs(b.m - a.m) < 45);
+function starBtn(a) {
+  return `<button type="button" class="star" data-star="${a.id}" aria-pressed="${favs.has(a.id)}" aria-label="Markeer ${esc(a.name)}">${ICON_STAR}</button>`;
 }
-function actHTML(a, showVenue) {
-  const c = clashes(a);
-  return `<div class="act" data-id="${a.id}">
-    ${showVenue ? "" : `<div class="time">${a.time}</div>`}
-    <div class="main">
+function linksHTML(a) {
+  return LINKS.filter(([k]) => a.media[k]).map(([k, label]) => `<a href="${esc(a.media[k])}" target="_blank" rel="noopener">${label}</a>`).join("");
+}
+function clashHTML(a) {
+  if (!favs.has(a.id)) return "";
+  const c = ACTS.filter(b => b.id !== a.id && favs.has(b.id) && Math.abs(b.m - a.m) < SET);
+  return c.length ? `<span class="clash">Overlapt met ${c.map(b => esc(b.name) + " (" + b.time + ")").join(", ")}</span>` : "";
+}
+function rowHTML(a, mode) {
+  const lead = mode === "venue" ? `<span class="t">${a.time}</span>` : "";
+  const venue = mode === "venue" ? "" : `<span class="venue-tag"><span class="num">${a.num}</span>${esc(a.venue)}</span>`;
+  return `<div class="row">
+    ${mode === "venue" ? lead : playBtn(a)}
+    <div class="info">
       <a class="name" href="https://popronde.nl/profiel/${a.id}" target="_blank" rel="noopener">${esc(a.name)}</a>
-      ${showVenue ? `<div class="where"><span class="num" style="display:inline-block;width:18px;height:18px;line-height:18px;font-size:10px;margin-right:6px">${a.num}</span>${esc(a.venue)}</div>` : ""}
-      <div class="tags">${a.tags.map(t => `<span class="tag">${esc(t)}</span>`).join("")}</div>
-      ${a.desc ? `<p class="desc">${esc(a.desc)}</p><button type="button" class="more">Meer lezen</button>` : ""}
-      <div class="links">${links(a)}</div>
-      ${c.length ? `<div class="clash">Overlapt met ${c.map(b => esc(b.name) + " (" + b.time + ")").join(", ")}</div>` : ""}
+      <div class="meta">${isNow(a) ? '<span class="now">Nu</span>' : ""}${venue}<span class="genre">${esc(a.tags.join(" · "))}</span></div>
+      ${a.desc ? `<p class="desc">${esc(a.desc)}</p>` : ""}
+      <div class="links">${linksHTML(a)}</div>
+      ${clashHTML(a)}
     </div>
-    <button type="button" class="star" aria-pressed="${favs.has(a.id)}" aria-label="Markeer ${esc(a.name)}" data-star="${a.id}">${STAR}</button>
+    <div class="side">${mode === "venue" ? playBtn(a) : ""}${starBtn(a)}</div>
   </div>`;
 }
 
-function renderTL() {
-  const start = 18 * 60, end = 25 * 60, span = end - start, setLen = 45;
-  const ticks = []; for (let m = start; m <= end; m += 60) ticks.push(m);
-  const pct = m => ((m - start) / span * 100).toFixed(3) + "%";
-  let html = `<div class="tl-scroll"><div class="tl">
-    <div class="tl-row tl-head"><div class="tl-venue">Locatie</div><div class="tl-lane">${ticks.map(m => `<span class="tick" style="left:${pct(m)}">${String(Math.floor(m / 60) % 24).padStart(2, "0")}:00</span>`).join("")}</div></div>`;
-  for (const [num, name] of venues) {
-    const acts = ACTS.filter(a => a.num === num);
-    html += `<div class="tl-row"><div class="tl-venue"><span class="num">${num}</span>${esc(name)}</div><div class="tl-lane">`;
-    for (const a of acts) {
-      const next = acts.filter(b => b.m > a.m).map(b => b.m).sort((x, y) => x - y)[0];
-      const len = Math.min(setLen, next ? next - a.m - 5 : setLen);
-      html += `<a class="blk ${favs.has(a.id) ? "fav" : ""} ${visible(a) ? "" : "dim"}" href="https://popronde.nl/profiel/${a.id}" target="_blank" rel="noopener" style="left:${pct(a.m)};width:${(len / span * 100).toFixed(3)}%" title="${a.time} ${esc(a.name)} (${esc(a.tags.join(", "))})"><span class="t">${a.time}</span><span class="n">${esc(a.name)}</span></a>`;
-    }
-    html += `</div></div>`;
-  }
-  html += `</div></div><p class="tl-note">Alleen begintijden zijn bekend. Blokken tonen ongeveer 45 minuten. Ingekleurd = met ster gemarkeerd. Voor genres en luisterlinks: Per locatie of Op tijd.</p>`;
-  return html;
-}
-function renderVenue() {
-  const blocks = venues.map(([num, name]) => {
-    const acts = ACTS.filter(a => a.num === num && visible(a));
-    if (!acts.length) return "";
-    const acc = ACTS.find(a => a.num === num).wheelchair;
-    return `<section class="venue"><h2><span class="num">${num}</span>${esc(name)}</h2>${acc ? `<div class="access">Rolstoeltoegankelijk</div>` : ""}<div class="acts">${acts.map(a => actHTML(a, false)).join("")}</div></section>`;
-  }).join("");
-  return blocks ? `<div class="venues">${blocks}</div>` : `<p class="empty">Niets gevonden met deze filters.</p>`;
-}
-function renderTime() {
+function renderLineup() {
   const acts = ACTS.filter(visible).sort((a, b) => a.m - b.m || a.num - b.num);
-  if (!acts.length) return `<p class="empty">Niets gevonden met deze filters.</p>`;
-  const groups = new Map(); acts.forEach(a => { if (!groups.has(a.time)) groups.set(a.time, []); groups.get(a.time).push(a); });
-  return `<div class="chrono">${[...groups].map(([t, list]) => `<div class="slot"><div class="time">${t}</div><div class="acts">${list.map(a => actHTML(a, true)).join("")}</div></div>`).join("")}</div>`;
+  if (!acts.length) return `<p class="empty">Niets gevonden. Zet een ster bij acts of kies een ander genre.</p>`;
+  const groups = new Map();
+  acts.forEach(a => { if (!groups.has(a.time)) groups.set(a.time, []); groups.get(a.time).push(a); });
+  return `<div class="card">${[...groups].map(([t, list]) => `<div class="slot-time">${t}<small>${list.length === 1 ? "1 act" : list.length + " acts"}</small></div>${list.map(a => rowHTML(a, "time")).join("")}`).join("")}</div>`;
 }
-function renderChips() {
-  const el = document.getElementById("chips");
-  el.innerHTML = `<button type="button" class="chip mine" id="f-fav" aria-pressed="${onlyFav}">★ Mijn avond (${favs.size})</button>` +
-    `<button type="button" class="chip" id="g-all" aria-pressed="${!genre}">Alle genres</button>` +
-    genres.map(g => `<button type="button" class="chip" data-genre="${esc(g)}" aria-pressed="${genre === g}">${esc(g)}</button>`).join("");
+function renderVenues() {
+  const html = venues.map(v => {
+    const acts = ACTS.filter(a => a.num === v.num && visible(a));
+    if (!acts.length) return "";
+    return `<section class="venue"><h2><span class="num">${v.num}</span>${esc(v.name)}</h2>${v.acc ? `<p class="acc">Rolstoeltoegankelijk</p>` : `<p class="acc">&nbsp;</p>`}${acts.map(a => rowHTML(a, "venue")).join("")}</section>`;
+  }).join("");
+  return html ? `<div class="venues">${html}</div>` : `<p class="empty">Niets gevonden. Zet een ster bij acts of kies een ander genre.</p>`;
 }
+function renderTL() {
+  const start = 18 * 60, end = 25 * 60, span = end - start;
+  const pct = m => ((m - start) / span * 100).toFixed(3) + "%";
+  const ticks = []; for (let m = start; m < end; m += 60) ticks.push(m);
+  let h = `<div class="tl-scroll"><div class="tl"><div class="tl-row tl-head"><div class="tl-venue"></div><div class="tl-lane">${ticks.map(m => `<span class="tick" style="left:${pct(m)}">${String(Math.floor(m / 60) % 24).padStart(2, "0")}:00</span>`).join("")}</div></div>`;
+  for (const v of venues) {
+    const acts = ACTS.filter(a => a.num === v.num);
+    h += `<div class="tl-row"><div class="tl-venue"><span class="num">${v.num}</span>${esc(v.name)}</div><div class="tl-lane">`;
+    acts.forEach(a => {
+      const next = acts.map(b => b.m).filter(m => m > a.m).sort((x, y) => x - y)[0];
+      const len = Math.min(SET, next ? next - a.m - 4 : SET);
+      h += `<div class="blk ${favs.has(a.id) ? "fav" : ""} ${visible(a) ? "" : "dim"}" style="left:${pct(a.m)};width:${(len / span * 100).toFixed(3)}%">${playBtn(a)}<div class="bt"><span>${a.time}</span><a href="https://popronde.nl/profiel/${a.id}" target="_blank" rel="noopener" title="${esc(a.name)}: ${esc(a.tags.join(", "))}">${esc(a.name)}</a></div></div>`;
+    });
+    h += `</div></div>`;
+  }
+  return h + `</div></div><p class="note">Alleen begintijden zijn bekend; blokken tonen ongeveer 45 minuten. Zwart = met ster gemarkeerd. Scroll opzij voor later op de avond.</p>`;
+}
+
+const out = document.getElementById("out");
+const sel = document.getElementById("f-genre");
+sel.innerHTML = `<option value="">Alle genres</option>` + genres.map(g => `<option value="${esc(g)}">${esc(g)}</option>`).join("");
+
 function render() {
-  document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.view === view));
-  renderChips();
-  const out = document.getElementById("out");
-  out.innerHTML = view === "tl" ? renderTL() : view === "venue" ? renderVenue() : renderTime();
-  const n = ACTS.filter(visible).length;
-  document.getElementById("count").textContent = `${n} van ${ACTS.length} acts`;
+  const sx = document.querySelector(".tl-scroll")?.scrollLeft;
+  document.querySelectorAll("[data-view]").forEach(b => b.setAttribute("aria-pressed", b.dataset.view === view));
+  const fb = document.getElementById("f-fav");
+  fb.setAttribute("aria-pressed", onlyFav);
+  fb.textContent = `★ Mijn avond (${favs.size})`;
+  out.innerHTML = view === "venues" ? renderVenues() : view === "tl" ? renderTL() : renderLineup();
+  if (sx) { const s = document.querySelector(".tl-scroll"); if (s) s.scrollLeft = sx; }
+  document.getElementById("count").textContent = `${ACTS.filter(visible).length} van ${ACTS.length} acts`;
 }
+
+/* audio */
+const audio = document.getElementById("audio");
+const player = document.getElementById("player");
+const pToggle = document.getElementById("p-toggle");
+function updatePlayer() {
+  const a = ACTS.find(x => x.id === playing);
+  player.hidden = !a;
+  if (!a) return;
+  document.getElementById("p-name").textContent = a.name;
+  document.getElementById("p-sub").textContent = `${a.time} · ${a.venue} · luistertrack`;
+  pToggle.innerHTML = audio.paused ? ICON_PLAY : ICON_PAUSE;
+  pToggle.setAttribute("aria-label", audio.paused ? "Afspelen" : "Pauze");
+}
+function toggle(id) {
+  const a = ACTS.find(x => x.id === id);
+  if (!a || !a.audio) return;
+  if (playing === id) { audio.paused ? audio.play().catch(() => {}) : audio.pause(); }
+  else { playing = id; audio.src = a.audio; audio.play().catch(() => {}); }
+}
+["play", "pause", "ended", "error"].forEach(ev => audio.addEventListener(ev, () => { render(); updatePlayer(); }));
+audio.addEventListener("timeupdate", () => { document.getElementById("p-bar").style.width = (audio.duration ? audio.currentTime / audio.duration * 100 : 0) + "%"; });
+pToggle.addEventListener("click", () => toggle(playing));
+document.getElementById("p-close").addEventListener("click", () => { audio.pause(); audio.removeAttribute("src"); playing = null; render(); updatePlayer(); });
+
 document.addEventListener("click", e => {
-  const v = e.target.closest("[data-view]"); if (v) { view = v.dataset.view; save(); render(); return; }
-  const s = e.target.closest("[data-star]"); if (s) { const id = s.dataset.star; favs.has(id) ? favs.delete(id) : favs.add(id); save(); render(); return; }
-  if (e.target.closest("#f-fav")) { onlyFav = !onlyFav; render(); return; }
-  if (e.target.closest("#g-all")) { genre = null; render(); return; }
-  const g = e.target.closest("[data-genre]"); if (g) { genre = genre === g.dataset.genre ? null : g.dataset.genre; render(); return; }
-  const m = e.target.closest(".more"); if (m) { const act = m.closest(".act"); act.classList.toggle("open"); m.textContent = act.classList.contains("open") ? "Minder" : "Meer lezen"; }
+  const v = e.target.closest("[data-view]"); if (v) { view = v.dataset.view; store.set("pra-view", view); render(); return; }
+  const p = e.target.closest("[data-play]"); if (p) { toggle(p.dataset.play); return; }
+  const s = e.target.closest("[data-star]"); if (s) { const id = s.dataset.star; favs.has(id) ? favs.delete(id) : favs.add(id); store.set("pra-favs", [...favs]); render(); return; }
+  if (e.target.closest("#f-fav")) { onlyFav = !onlyFav; render(); }
 });
+sel.addEventListener("change", () => { genre = sel.value; render(); });
 render();
+setInterval(() => { if (nowMin() !== null) render(); }, 60000);
 </script>
 </body>
 </html>
