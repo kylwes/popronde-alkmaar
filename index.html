@@ -25,9 +25,9 @@
   </header>
 
   <div class="controls">
+    <button type="button" class="pill" data-view="tl" id="v-tl">Tijdlijn</button>
     <button type="button" class="pill" data-view="lineup" id="v-lineup">Line-up</button>
     <button type="button" class="pill" data-view="venues" id="v-venues">Locaties</button>
-    <button type="button" class="pill" data-view="tl" id="v-tl">Tijdlijn</button>
     <span class="spacer"></span>
     <button type="button" class="pill" id="f-fav" aria-pressed="false">★ Mijn avond</button>
     <select class="select" id="f-genre" aria-label="Filter op genre"></select>
@@ -55,7 +55,7 @@ const store = {
   get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 };
-let view = store.get("pra-view", "lineup");
+let view = store.get("pra-view2", "tl");
 let favs = new Set(store.get("pra-favs", []));
 let genre = "", onlyFav = false;
 
@@ -123,36 +123,80 @@ function renderVenues() {
   }).join("");
   return html ? `<div class="venues">${html}</div>` : `<p class="empty">Niets gevonden. Zet een ster bij acts of kies een ander genre.</p>`;
 }
-function renderTL() {
-  const start = 18 * 60, end = 25 * 60, span = end - start;
-  const pct = m => ((m - start) / span * 100).toFixed(3) + "%";
-  const ticks = []; for (let m = start; m < end; m += 60) ticks.push(m);
-  let h = `<div class="tl-scroll"><div class="tl"><div class="tl-row tl-head"><div class="tl-venue"></div><div class="tl-lane">${ticks.map(m => `<span class="tick" style="left:${pct(m)}">${String(Math.floor(m / 60) % 24).padStart(2, "0")}:00</span>`).join("")}</div></div>`;
+const TL_START = 18 * 60, TL_END = 25 * 60 + 30;
+const mobileTL = matchMedia("(max-width: 700px)");
+const hh = m => String(Math.floor(m / 60) % 24).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
+function blocksFor(v) {
+  const acts = ACTS.filter(a => a.num === v.num);
+  return acts.map(a => {
+    const next = acts.map(b => b.m).filter(m => m > a.m).sort((x, y) => x - y)[0];
+    return { a, len: Math.min(SET, next ? next - a.m - 4 : SET) };
+  });
+}
+function blkClass(a) { return `blk ${favs.has(a.id) ? "fav" : ""} ${visible(a) ? "" : "dim"} ${isNow(a) ? "live" : ""}`; }
+function renderTL() { return mobileTL.matches ? renderTLv() : renderTLh(); }
+function renderTLh() {
+  const span = TL_END - TL_START;
+  const pct = m => ((m - TL_START) / span * 100).toFixed(3) + "%";
+  const ticks = []; for (let m = TL_START; m < TL_END; m += 60) ticks.push(m);
+  const n = nowMin();
+  let h = `<div class="tl-scroll"><div class="tl"><div class="tl-row tl-head"><div class="tl-venue"></div><div class="tl-lane">${ticks.map(m => `<span class="tick" style="left:${pct(m)}">${hh(m)}</span>`).join("")}</div></div>`;
   for (const v of venues) {
-    const acts = ACTS.filter(a => a.num === v.num);
     h += `<div class="tl-row"><div class="tl-venue"><span class="num">${v.num}</span>${esc(v.name)}</div><div class="tl-lane">`;
-    acts.forEach(a => {
-      const next = acts.map(b => b.m).filter(m => m > a.m).sort((x, y) => x - y)[0];
-      const len = Math.min(SET, next ? next - a.m - 4 : SET);
-      h += `<div class="blk ${favs.has(a.id) ? "fav" : ""} ${visible(a) ? "" : "dim"}" style="left:${pct(a.m)};width:${(len / span * 100).toFixed(3)}%">${playBtn(a)}<div class="bt"><span>${a.time}</span><a href="artiest/${a.slug}/" title="${esc(a.name)}: ${esc(a.tags.join(", "))}">${esc(a.name)}</a></div></div>`;
-    });
+    for (const { a, len } of blocksFor(v)) {
+      h += `<div class="${blkClass(a)}" style="left:${pct(a.m)};width:${(len / span * 100).toFixed(3)}%">${playBtn(a)}<div class="bt"><span>${a.time}</span><a href="artiest/${a.slug}/" title="${esc(a.name)}: ${esc(a.tags.join(", "))}">${esc(a.name)}</a></div></div>`;
+    }
     h += `</div></div>`;
   }
-  return h + `</div></div><p class="note">Alleen begintijden zijn bekend; blokken tonen ongeveer 45 minuten. Zwart = met ster gemarkeerd. Scroll opzij voor later op de avond.</p>`;
+  if (n !== null && n >= TL_START && n <= TL_END) h += `<div class="now-line-h" style="left:calc(170px + (100% - 170px) * ${(n - TL_START) / span})"><span>Nu</span></div>`;
+  return h + `</div></div><p class="note">Alleen begintijden zijn bekend; blokken tonen ongeveer 45 minuten. Zwart = met ster gemarkeerd.</p>`;
+}
+function renderTLv() {
+  const PX = 2.1, COL = 116, TIME = 46, HEAD = 58;
+  const H = (TL_END - TL_START) * PX;
+  const n = nowMin();
+  let h = `<div class="tlv-scroll" id="tlv"><div class="tlv" style="width:${TIME + COL * venues.length}px">`;
+  h += `<div class="tlv-head" style="height:${HEAD}px"><div class="tlv-corner" style="width:${TIME}px"></div>`;
+  h += venues.map(v => `<div class="tlv-vh" style="width:${COL}px"><span class="num">${v.num}</span><span>${esc(v.name)}</span></div>`).join("");
+  h += `</div><div class="tlv-body" style="height:${H + 90}px"><div class="tlv-times" style="width:${TIME}px">`;
+  for (let m = TL_START; m < TL_END; m += 30) h += `<span class="${m % 60 ? "half" : ""}" style="top:${(m - TL_START) * PX}px">${m % 60 ? ":30" : hh(m)}</span>`;
+  if (n !== null && n >= TL_START && n <= TL_END) h += `<span class="now-tag" style="top:${(n - TL_START) * PX}px">Nu</span>`;
+  h += `</div>`;
+  for (const v of venues) {
+    h += `<div class="tlv-col" style="width:${COL}px;--hr:${60 * PX}px">`;
+    for (const { a, len } of blocksFor(v)) {
+      h += `<div class="${blkClass(a)}" style="top:${(a.m - TL_START) * PX}px;height:${len * PX}px">${playBtn(a)}<a class="bn" href="artiest/${a.slug}/"><span class="bt2">${a.time}</span><b>${esc(a.name)}</b><small>${esc(a.tags.join(" · "))}</small></a></div>`;
+    }
+    h += `</div>`;
+  }
+  if (n !== null && n >= TL_START && n <= TL_END) h += `<div class="now-line-v" style="top:${(n - TL_START) * PX}px"></div>`;
+  h += `</div></div></div><p class="note">Swipe opzij voor alle 17 locaties, scroll omlaag voor later op de avond. Blokken tonen ongeveer 45 minuten.</p>`;
+  return h;
 }
 
 const out = document.getElementById("out");
 const sel = document.getElementById("f-genre");
 sel.innerHTML = `<option value="">Alle genres</option>` + genres.map(g => `<option value="${esc(g)}">${esc(g)}</option>`).join("");
 
+let tlScrolled = false;
 function render() {
-  const sx = document.querySelector(".tl-scroll")?.scrollLeft;
+  const sc = document.querySelector(".tl-scroll, .tlv-scroll");
+  const sx = sc?.scrollLeft, sy = sc?.scrollTop;
   document.querySelectorAll("[data-view]").forEach(b => b.setAttribute("aria-pressed", b.dataset.view === view));
   const fb = document.getElementById("f-fav");
   fb.setAttribute("aria-pressed", onlyFav);
   fb.textContent = `★ Mijn avond (${favs.size})`;
   out.innerHTML = view === "venues" ? renderVenues() : view === "tl" ? renderTL() : renderLineup();
-  if (sx) { const s = document.querySelector(".tl-scroll"); if (s) s.scrollLeft = sx; }
+  const sc2 = document.querySelector(".tl-scroll, .tlv-scroll");
+  if (sc2 && sc && sc.className === sc2.className) { sc2.scrollLeft = sx; sc2.scrollTop = sy; }
+  else if (sc2 && !tlScrolled) {
+    tlScrolled = true;
+    const n = nowMin();
+    if (n !== null) {
+      if (sc2.classList.contains("tlv-scroll")) sc2.scrollTop = Math.max(0, (n - TL_START) * 2.1 - 120);
+      else sc2.scrollLeft = Math.max(0, (n - TL_START) / (TL_END - TL_START) * (sc2.scrollWidth - 170) - 200);
+    }
+  }
   document.getElementById("count").textContent = `${ACTS.filter(visible).length} van ${ACTS.length} acts`;
 }
 
@@ -163,12 +207,16 @@ function toggle(id) {
 }
 
 document.addEventListener("click", e => {
-  const v = e.target.closest("[data-view]"); if (v) { view = v.dataset.view; store.set("pra-view", view); render(); return; }
+  const v = e.target.closest("[data-view]"); if (v) { view = v.dataset.view; store.set("pra-view2", view); render(); return; }
   const p = e.target.closest("[data-play]"); if (p) { toggle(p.dataset.play); return; }
   const s = e.target.closest("[data-star]"); if (s) { const id = s.dataset.star; favs.has(id) ? favs.delete(id) : favs.add(id); store.set("pra-favs", [...favs]); render(); return; }
   if (e.target.closest("#f-fav")) { onlyFav = !onlyFav; render(); }
 });
 sel.addEventListener("change", () => { genre = sel.value; render(); });
+mobileTL.addEventListener("change", () => { if (view === "tl") render(); });
+const ctrl = document.querySelector(".controls");
+const setCtrlH = () => document.documentElement.style.setProperty("--ctrl-h", ctrl.offsetHeight + "px");
+setCtrlH(); if (window.ResizeObserver) new ResizeObserver(setCtrlH).observe(ctrl);
 render();
 setInterval(() => { if (nowMin() !== null) render(); }, 60000);
 </script>
