@@ -133,28 +133,27 @@ footer a { font-weight: 600; }
 .now-line-h { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--bad); z-index: 3; pointer-events: none; }
 .now-line-h span, .now-line-v span { position: absolute; background: var(--bad); color: #fff; font-size: .65rem; font-weight: 700; padding: 1px 6px; border-radius: 1rem; white-space: nowrap; }
 .now-line-h span { top: 2px; left: 4px; }
-/* tijdlijn verticaal (mobiel) */
-.tlv-scroll { overflow: auto; overscroll-behavior: contain; background: var(--card); border-radius: 1.25rem; height: calc(100svh - var(--ctrl-h, 120px) - env(safe-area-inset-top, 0px) - 16px); min-height: 380px; -webkit-overflow-scrolling: touch; }
-.tlv { position: relative; }
-.tlv-head { position: sticky; top: 0; z-index: 4; display: flex; background: var(--card); border-bottom: 1px solid var(--line); }
-.tlv-corner { position: sticky; left: 0; z-index: 5; background: var(--card); flex: none; }
-.tlv-vh { flex: none; display: flex; align-items: center; gap: 6px; padding: 0 8px; font-weight: 700; font-size: .72rem; line-height: 1.1; border-left: 1px solid var(--line); }
-.tlv-vh span:last-child { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.tlv-body { display: flex; position: relative; }
-.tlv-times { position: sticky; left: 0; z-index: 3; background: var(--card); flex: none; }
-.tlv-times span { position: absolute; left: 0; right: 0; text-align: center; transform: translateY(-50%); font-family: var(--pixel); font-size: 20px; line-height: 1; margin-top: 8px; }
-.tlv-times span.half { font-size: 15px; color: var(--muted); }
-.tlv-col { flex: none; position: relative; margin-top: 8px; border-left: 1px solid var(--line); background: repeating-linear-gradient(180deg, var(--line) 0 1px, transparent 1px calc(var(--hr) / 2)); background-color: var(--lane); }
-.tlv-col .blk { left: 4px; right: 4px; top: 0; bottom: auto; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 4px; padding: 6px; border-radius: 10px; }
-.tlv-col .blk .play { width: 28px; height: 28px; position: absolute; right: 4px; top: 4px; }
-.tlv-col .blk .play svg { width: 10px; height: 10px; }
-.tlv-col .bn { text-decoration: none; display: flex; flex-direction: column; gap: 2px; min-width: 0; width: 100%; padding-right: 2px; }
-.tlv-col .bn .bt2 { font-family: var(--pixel); font-size: 18px; line-height: .9; }
-.tlv-col .bn b { margin-top: 6px; font-size: .8rem; line-height: 1.1; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.tlv-col .bn small { font-size: .62rem; opacity: .7; font-weight: 600; line-height: 1.15; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
-.now-line-v { position: absolute; left: 0; right: 0; height: 2px; background: var(--bad); z-index: 1; margin-top: 8px; pointer-events: none; }
-.tlv-col .blk { z-index: 2; }
-.tlv-times .now-tag { left: 3px; right: 3px; z-index: 2; background: var(--bad); color: #fff; font: 700 .65rem var(--sans); padding: 2px 0; border-radius: 1rem; }
+/* tijdlijn mobiel: horizontaal, sticky tijdbalk en zaalkolom */
+.tlm-scroll { overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; background: var(--card); border-radius: 1.25rem; -webkit-overflow-scrolling: touch; }
+.tlm { position: relative; padding-bottom: 4px; }
+.tlm-head { position: relative; z-index: 4; display: flex; background: var(--card); }
+.tlm-corner { position: sticky; left: 0; z-index: 5; background: var(--card); flex: none; }
+.tlm-ticks { position: relative; flex: none; }
+.tlm-ticks span { position: absolute; bottom: 6px; padding-left: 4px; font-family: var(--pixel); font-size: 22px; line-height: 1; white-space: nowrap; }
+.tlm-ticks span.half { font-size: 16px; color: var(--muted); }
+.tlm-ticks .now-tag { z-index: 2; bottom: auto; top: 2px; transform: translateX(-50%); padding: 2px 8px; background: var(--bad); color: #fff; font: 700 .65rem var(--sans); border-radius: 1rem; }
+.tlm-body { position: relative; }
+.tlm-row { display: flex; }
+.tlm-v { position: sticky; left: 0; z-index: 3; flex: none; background: var(--card); display: flex; align-items: center; gap: 6px; padding: 0 6px 0 8px; font-weight: 700; font-size: .7rem; line-height: 1.1; border-right: 1px solid var(--line); }
+.tlm-v .vn { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.tlm-lane { position: relative; flex: none; margin: 3px 0; border-radius: 10px; background: var(--lane) repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px calc(var(--hr) / 2)); }
+.tlm-lane .blk { top: 4px; bottom: 4px; z-index: 2; padding: 0 6px 0 4px; gap: 6px; }
+.tlm-lane .blk .play { width: 30px; height: 30px; }
+.tlm-lane .blk .play svg { width: 11px; height: 11px; }
+.tlm-lane .bn { text-decoration: none; display: flex; flex-direction: column; min-width: 0; }
+.tlm-lane .bn .bt2 { font-family: var(--pixel); font-size: 17px; line-height: .9; }
+.tlm-lane .bn b { font-size: .78rem; line-height: 1.1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.now-line-m { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--bad); z-index: 1; pointer-events: none; }
 
 @media (max-width: 600px) {
   .hero { padding-block: 28px 18px; }
