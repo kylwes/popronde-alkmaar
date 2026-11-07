@@ -39,7 +39,7 @@ button { font: inherit; color: inherit; }
 
 .topbar { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .hero { padding-block: 40px 28px; }
-h1 { font-family: var(--pixel); font-weight: 400; font-size: clamp(120px, 31vw, 330px); line-height: .72; margin: 0; text-transform: uppercase; letter-spacing: .01em; word-break: break-word; }
+h1 { font-family: var(--pixel); font-weight: 400; font-size: clamp(64px, 16.5vw, 190px); line-height: .78; margin: 0; text-transform: uppercase; letter-spacing: .01em; word-break: break-word; }
 .date { font-weight: 700; font-size: clamp(44px, 10vw, 96px); line-height: 1; margin: 6px 0 0; letter-spacing: -.01em; }
 .facts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 22px; }
 .facts span { background: var(--card); border-radius: 1.5rem; padding: .45rem 1rem; font-weight: 600; font-size: .8rem; }
