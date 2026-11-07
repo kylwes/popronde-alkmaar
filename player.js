@@ -1,4 +1,4 @@
-/* Gedeelde speler: één track tegelijk, pauze bewaart positie (ook na sluiten of wisselen van pagina). */
+/* Gedeelde speler + navigatie binnen de site: alleen .wrap wisselt, de speler blijft doorspelen. */
 (function () {
   const ICON_PLAY = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9.5-5.5z"/></svg>';
   const ICON_PAUSE = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 2.5h3.2v11H3.5zM9.3 2.5h3.2v11H9.3z"/></svg>';
@@ -85,12 +85,72 @@
   audio.addEventListener("timeupdate", () => { progress(); if (Math.floor(audio.currentTime) % 3 === 0) save(); });
   window.addEventListener("pagehide", save);
 
+  let pageCtl = new AbortController();
+
   window.PR = {
     toggle,
     isCurrent: id => !!current && current.id === id,
     isPlaying: id => !!current && current.id === id && !audio.paused,
     position: id => positions[id] || 0,
-    onChange: fn => listeners.push(fn),
+    onChange(fn) {
+      listeners.push(fn);
+      pageCtl.signal.addEventListener("abort", () => { const i = listeners.indexOf(fn); if (i > -1) listeners.splice(i, 1); });
+    },
+    get signal() { return pageCtl.signal; },
+    navigate,
     ICON_PLAY, ICON_PAUSE
   };
+
+  /* ---------- navigatie zonder herladen ---------- */
+  const cache = new Map();
+  const fetchPage = url => {
+    const key = url.split("#")[0];
+    if (!cache.has(key)) cache.set(key, fetch(key, { credentials: "same-origin" }).then(r => { if (!r.ok) throw new Error(r.status); return r.text(); }).catch(err => { cache.delete(key); throw err; }));
+    return cache.get(key);
+  };
+  function internal(a) {
+    if (!a || a.target === "_blank" || a.hasAttribute("download")) return null;
+    const url = new URL(a.href, location.href);
+    if (url.origin !== location.origin) return null;
+    if (url.pathname === location.pathname && url.hash) return null;
+    return url;
+  }
+  async function navigate(href, push = true) {
+    let html;
+    try { html = await fetchPage(href); } catch (e) { location.href = href; return; }
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const next = doc.querySelector(".wrap");
+    if (!next) { location.href = href; return; }
+    if (push) {
+      try { history.replaceState({ y: scrollY }, ""); } catch (e) {}
+      history.pushState({ y: 0 }, "", href);
+    }
+    pageCtl.abort();
+    pageCtl = new AbortController();
+    document.title = doc.title;
+    const desc = doc.querySelector('meta[name="description"]');
+    const mine = document.querySelector('meta[name="description"]');
+    if (desc && mine) mine.setAttribute("content", desc.getAttribute("content"));
+    document.querySelector(".wrap").replaceWith(document.adoptNode(next));
+    for (const old of doc.querySelectorAll("body > script:not([src])")) {
+      const sc = document.createElement("script");
+      sc.textContent = "(function(){\n" + old.textContent + "\n})();";
+      document.body.appendChild(sc);
+      sc.remove();
+    }
+    emit();
+    const y = push ? 0 : (history.state && history.state.y) || 0;
+    window.scrollTo(0, y);
+  }
+  document.addEventListener("click", e => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const url = internal(e.target.closest("a[href]"));
+    if (!url) return;
+    e.preventDefault();
+    if (url.href === location.href) return;
+    navigate(url.href);
+  });
+  document.addEventListener("pointerover", e => { const url = internal(e.target.closest && e.target.closest("a[href]")); if (url) fetchPage(url.href).catch(() => {}); }, { passive: true });
+  window.addEventListener("popstate", () => navigate(location.href, false));
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 })();

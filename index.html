@@ -214,14 +214,15 @@ document.addEventListener("click", e => {
   const p = e.target.closest("[data-play]"); if (p) { toggle(p.dataset.play); return; }
   const s = e.target.closest("[data-star]"); if (s) { const id = s.dataset.star; favs.has(id) ? favs.delete(id) : favs.add(id); store.set("pra-favs", [...favs]); render(); return; }
   if (e.target.closest("#f-fav")) { onlyFav = !onlyFav; render(); }
-});
+}, { signal: PR.signal });
 sel.addEventListener("change", () => { genre = sel.value; render(); });
-mobileTL.addEventListener("change", () => { if (view === "tl") render(); });
+mobileTL.addEventListener("change", () => { if (view === "tl") render(); }, { signal: PR.signal });
 const ctrl = document.querySelector(".controls");
 const setCtrlH = () => document.documentElement.style.setProperty("--ctrl-h", ctrl.offsetHeight + "px");
-setCtrlH(); if (window.ResizeObserver) new ResizeObserver(setCtrlH).observe(ctrl);
+setCtrlH(); if (window.ResizeObserver) { const ro = new ResizeObserver(setCtrlH); ro.observe(ctrl); PR.signal.addEventListener("abort", () => ro.disconnect()); }
 render();
-setInterval(() => { if (nowMin() !== null) render(); }, 60000);
+const tick = setInterval(() => { if (nowMin() !== null) render(); }, 60000);
+PR.signal.addEventListener("abort", () => clearInterval(tick));
 </script>
 </body>
 </html>
