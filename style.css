@@ -40,6 +40,9 @@ button { font: inherit; color: inherit; }
 .topbar { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .hero { padding-block: 40px 28px; }
 h1 { font-family: var(--pixel); font-weight: 400; font-size: clamp(64px, 16.5vw, 190px); line-height: .78; margin: 0; text-transform: uppercase; letter-spacing: .01em; word-break: break-word; }
+.kicker { margin: 0 0 28px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.kicker span { font-weight: 600; font-size: clamp(.95rem, 2.4vw, 1.2rem); color: var(--muted); }
+.kicker strong { display: inline-block; background: var(--ink); color: var(--bg); font-weight: 800; font-size: clamp(30px, 7vw, 64px); line-height: 1; letter-spacing: -.01em; padding: .2em .45em .22em; border-radius: 1.5rem; transform: rotate(-2deg); transform-origin: left center; }
 .date { font-weight: 700; font-size: clamp(44px, 10vw, 96px); line-height: 1; margin: 6px 0 0; letter-spacing: -.01em; }
 .facts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 22px; }
 .facts span { background: var(--card); border-radius: 1.5rem; padding: .45rem 1rem; font-weight: 600; font-size: .8rem; }
